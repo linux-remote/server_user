@@ -5,6 +5,6 @@ exports._reGetItem = function(req, res, next){
     if(err){
       return next(err);
     }
-    res.apiOk(result);
+    res.json(result);
   })
 }

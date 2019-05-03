@@ -4,7 +4,7 @@ const fs = require('fs');
 const sas = require('sas');
 const path = require('path');
 const {wrapPath} = require('./util');
-const {ensureUniqueId, preventUnxhr} = require('../../common/util');
+const { ensureUniqueId, preventUnxhr } = require('../lib/util');
 const {_reGetItem} = require('./common');
 const ls = require('./ls');
 const cmd = require('./cmd');
@@ -82,7 +82,7 @@ function checkCover(req, res, next){
         covered.push(filename)
       }
     });
-    res.apiOk(covered);
+    res.json(covered);
   })
 }
 
@@ -104,7 +104,7 @@ function rename(req, res, next){
   const newPath = path.join(req.PATH, newName);
   fs.rename(oldPath, newPath, function(err){
     if(err) return next(err);
-    res.apiOk();
+    res.end('ok');
   })
 }
 
@@ -123,14 +123,14 @@ function moveToDustbin(req, res, next){
   const move = cb => exec(`mv ${wrapedPath} ${dustPath}`, cb);
   sas([move, link], function(err){
     if(err) return next(err);
-    res.apiOk();
+    res.end('ok');
   })
 }
 
 function deleteAll(req, res, next){
   exec('rm -rf ' + wrapPath(req.PATH), function(err){
     if(err) return next(err);
-    res.apiOk();
+    res.end('ok');
   })
 }
 
@@ -171,17 +171,11 @@ function createFile(req, res, next){
   });
 }
 
-// function readFile(req, res, next){
-//   fs.readFile(req.PATH, 'utf-8', function(err, result){
-//     if(err) return next(err);
-//     res.apiOk(result);
-//   })
-// }
 
 function readDir(req, res, next){
   ls(req.PATH, (err, result) => {
     if(err) return next(err);
-    res.apiOk(result);
+    res.json(result);
   })
 }
 

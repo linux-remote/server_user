@@ -7,7 +7,7 @@ const {exec} = require('child_process');
 router.get('/', function(req, res, next){
   exec('cat /etc/issue', (err, result) => {
     if(err) return next(err);
-    res.apiOk({
+    res.json({
       platform: os.platform(),
       hostname: os.hostname(),
       uptime: os.uptime(),

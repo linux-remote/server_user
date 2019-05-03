@@ -47,7 +47,7 @@ router.get('/', function(req, res, next){
           //map[key][subKey] = v;
         });
         map = null;
-        res.apiOk(result2);
+        res.json(result2);
       })
 })
 
@@ -61,7 +61,7 @@ router.post('/recycle', function(req, res, next){
     delLnk: cb => exec(`rm -rf ${global.RECYCLE_BIN_PATH}/${name}.lnk`, cb)
   }, (err) => {
     if(err) return next(err);
-    res.apiOk();
+    res.json();
   })
 });
 
@@ -72,14 +72,14 @@ router.delete('/:name', function(req, res, next){
     delLnk: cb => exec(`rm -rf ${global.RECYCLE_BIN_PATH}/${name}.lnk`, cb)
   }, (err) => {
     if(err) return next(err);
-    res.apiOk();
+    res.end('ok');
   })
 });
 
 router.delete('/', function(req, res, next){
   exec(`rm -rf ${global.RECYCLE_BIN_PATH}/*`, err => {
     if(err) return next(err);
-    res.apiOk();
+    res.end('ok');
   });
   // fs.readdir(global.RECYCLE_BIN_PATH, (err, files){
   //   if(err) return next(err);

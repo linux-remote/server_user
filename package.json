@@ -8,7 +8,7 @@
     "url": "git@github.com:linux-remote/server.git"
   },
   "scripts": {
-    "start": "NODE_ENV=development nodemon --ignore test/ -e js -L dev_start.js",
+    "start": "NODE_ENV=development PORT=/dev/shm/lr-dev-user-dw.sock nodemon --ignore test/ -e js -L server.js",
     "_devInstall": "cnpm i --by=npm --no-bin-links",
     "linuxIpty": "npm install node-pty --save --no-bin-links"
   },

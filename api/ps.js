@@ -5,7 +5,7 @@ const ps = function(req, res, next) {
     if(err) {
       return next(err);
     }
-    res.apiOk(reslut);
+    res.json(reslut);
   });
 }
 module.exports = ps;

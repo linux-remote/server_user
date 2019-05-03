@@ -17,7 +17,7 @@ router.get('/icons', function(req, res, next){
     if(err){
       return next(err);
     }
-    res.apiOk(result);
+    res.json(result);
   });
 });
 
@@ -26,7 +26,7 @@ router.post('/icons', function(req, res, next){
     if(err){
       return next(err);
     }
-    res.apiOk();
+    res.end('ok');
   })
 });
 
@@ -38,7 +38,7 @@ router.get('/quickBar', function(req, res, next){
     if(err){
       return next(err);
     }
-    res.apiOk(result);
+    res.json(result);
   });
 });
 
@@ -47,7 +47,7 @@ router.post('/quickBar', function(req, res, next){
     if(err){
       return next(err);
     }
-    res.apiOk();
+    res.send('ok');
   })
 });
 
@@ -65,7 +65,7 @@ router.get('/bundle', function(req, res, next){
     delete(result.recycebinFiles);
     result.groups = result.groups.substr(0, result.groups.length - 1).split(/\s/); //substr 去除最后的 \n 
 
-    res.apiOk({
+    res.json({
       ...result,
       hostname: os.hostname(),
       homedir: os.homedir(),

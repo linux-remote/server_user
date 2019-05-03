@@ -4,8 +4,8 @@ const http = require('http');
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const {onListening, onError, timeFormat} = require('../common/util');
-const { FLAG } = require('../lib/util');
+const { timeFormat, onListening, onError } = require('./lib/util');
+const { FLAG } = require('./lib/util');
 const ps = require('./api/ps');
 const PORT = process.env.PORT;
 execSync('rm -rf ' + PORT); //删除旧的 sock 文件, 才能启动.
@@ -22,15 +22,12 @@ global.RECYCLE_BIN_PATH = path.join(LR_PATH , '.recycle-bin');
 execSync('mkdir -m=755 -p ' + global.DESKTOP_PATH);
 execSync('mkdir -m=755 -p ' + global.RECYCLE_BIN_PATH);
 
-
-const apiWarp = require('../common/api-warp');
-const middleWare = require('../common/middleware');
+const middleWare = require('./common/middleware');
 const upload = require('./api/upload');
 const terminal = require('./lib/terminal');
 
 var app = express();
 app.disable('x-powered-by');
-apiWarp(app);
 
 
 
@@ -42,7 +39,7 @@ if(!global.IS_PRO){
 }
 terminal(app);
 
-app.use('/upload', middleWare.preventUnxhrMid, upload);
+app.use('/upload', middleWare.preventUnxhr, upload);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -89,7 +86,7 @@ app.get('/live', function(req, res){
 
 const desktop = require('./api/desktop');
 
-app.use('/desktop', middleWare.preventUnxhrMid, desktop);
+app.use('/desktop', middleWare.preventUnxhr, desktop);
 
 // sys apps
 const serverInfo = require('./api/server-info');
@@ -100,10 +97,10 @@ const disk = require('./api/disk');
 app.use('/fs', fsApi); // preventUnxhr inner.
 const eStatic = require('express').static;
 app.use('/fs', eStatic('/', {dotfiles: 'allow', maxAge: 0}));
-app.get('/disk',middleWare.preventUnxhrMid, disk);
-app.use('/serverInfo', middleWare.preventUnxhrMid, serverInfo);
-app.use('/recycleBin', middleWare.preventUnxhrMid, recycleBin);
-app.get('/ps', middleWare.preventUnxhrMid, ps);
+app.get('/disk',middleWare.preventUnxhr, disk);
+app.use('/serverInfo', middleWare.preventUnxhr, serverInfo);
+app.use('/recycleBin', middleWare.preventUnxhr, recycleBin);
+app.get('/ps', middleWare.preventUnxhr, ps);
 app.delete('/exit', function(req, res){
   res.send('exit');
   res.on('finish', function(){
