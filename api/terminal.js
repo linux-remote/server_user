@@ -2,7 +2,7 @@
 // Copyright and modify form: https://github.com/xtermjs/xterm.js/blob/master/demo/server.js
 
 const pty = require('node-pty');
-const {terminals, logs } = require('./pty');
+const { terminals, logs } = require('../lib/pty');
 
 
 // 
@@ -16,7 +16,7 @@ module.exports = function(app) {
       term = terminals[pid];
 
     term.resize(cols, rows);
-    console.log('Resized terminal ' + pid + ' to ' + cols + ' cols and ' + rows + ' rows.');
+    // console.log('Resized terminal ' + pid + ' to ' + cols + ' cols and ' + rows + ' rows.');
     res.end();
   });
   
@@ -29,18 +29,17 @@ module.exports = function(app) {
         name: 'xterm-color',
         cols: cols || 80,
         rows: rows || 24,
-        cwd: process.env.PWD,
+        cwd: process.env.HOME,
         env: process.env
       });
 
-    console.log('Created terminal with PID: ' + term.pid);
+    // console.log('Created terminal with PID: ' + term.pid);
     terminals[term.pid] = term;
     logs[term.pid] = '';
     term.on('data', function(data) {
       logs[term.pid] += data;
     });
     res.end(term.pid.toString());
-    // res.send(term.pid.toString());
   });
 
 

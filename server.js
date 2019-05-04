@@ -36,7 +36,7 @@ const eStatic = require('express').static;
 const { createPtyServer } = require('./lib/pty');
 const middleWare = require('./common/middleware');
 const upload = require('./api/upload');
-const terminal = require('./lib/terminal');
+const terminal = require('./api/terminal');
 const desktop = require('./api/desktop');
 const time = require('./api/time');
 
