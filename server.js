@@ -1,42 +1,62 @@
 const {execSync} = require('child_process');
 const path = require('path');
-const http = require('http');
-const express = require('express');
-const logger = require('morgan');
-const bodyParser = require('body-parser');
-const { timeFormat, onListening, onError } = require('./lib/util');
-const { FLAG } = require('./lib/util');
-const ps = require('./api/ps');
-const PORT = process.env.PORT;
-execSync('rm -rf ' + PORT); //删除旧的 sock 文件, 才能启动.
+const { FLAG, ERROR_FLAG } = require('./lib/util');
 
+const PORT = process.env.PORT;
+console.log('PORT', PORT);
+if(PORT.indexOf('/linux-remote') !== -1) {
+  execSync('rm -rf ' + PORT); //删除旧的 sock 文件, 才能启动.
+} else {
+  console.error(ERROR_FLAG);
+  throw new Error('port is not reasonable');
+}
 
 const NODE_ENV = process.env.NODE_ENV;
-global.IS_PRO = NODE_ENV === 'production';
+const IS_PRO = NODE_ENV === 'production';
+global.IS_PRO = IS_PRO;
+
 const LR_PATH = path.join(process.env.HOME, 'linux-remote');
 global.LR_PATH = LR_PATH;
 global.DESKTOP_PATH = path.join(LR_PATH , 'desktop');
 global.RECYCLE_BIN_PATH = path.join(LR_PATH , '.recycle-bin');
 
+
+const http = require('http');
+const express = require('express');
+const logger = require('morgan');
+const bodyParser = require('body-parser');
+const { onListening, onError } = require('./lib/util');
+
+const ps = require('./api/ps');
+const serverInfo = require('./api/server-info');
+const recycleBin = require('./api/dustbin');
+const fsApi = require('./api/fs');
+const disk = require('./api/disk');
+const eStatic = require('express').static;
+const { createPtyServer } = require('./lib/pty');
+const middleWare = require('./common/middleware');
+const upload = require('./api/upload');
+const terminal = require('./lib/terminal');
+const desktop = require('./api/desktop');
+const time = require('./api/time');
+
+
+
 //初始化用户文件
 execSync('mkdir -m=755 -p ' + global.DESKTOP_PATH);
 execSync('mkdir -m=755 -p ' + global.RECYCLE_BIN_PATH);
 
-const middleWare = require('./common/middleware');
-const upload = require('./api/upload');
-const terminal = require('./lib/terminal');
+
 
 var app = express();
 app.disable('x-powered-by');
 
 
 
-
-var _ttpMin = 15;
-if(!global.IS_PRO){
+if(!IS_PRO) {
   app.use(logger('dev'));
-  _ttpMin = 1000;
 }
+
 terminal(app);
 
 app.use('/upload', middleWare.preventUnxhr, upload);
@@ -46,32 +66,35 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 
 //================= 用户进程 TTL =================
+// var _ttpMin = 15;
+// if(!global.IS_PRO){
+//   _ttpMin = 1000;
+// }
+// const TTL_MAX_AGE = 1000 * 60 * _ttpMin;
 
-const TTL_MAX_AGE = 1000 * 60 * _ttpMin;
+// var now = Date.now();
 
-var now = Date.now();
+// console.log('[Process TTL] start at: ' + 
+//             timeFormat() + 
+//             '  maxAge: ' + 
+//             ((TTL_MAX_AGE / 1000) / 60)  + 
+//             ' minute.');
 
-console.log('[Process TTL] start at: ' + 
-            timeFormat() + 
-            '  maxAge: ' + 
-            ((TTL_MAX_AGE / 1000) / 60)  + 
-            ' minute.');
+// const TTL = function(){
+//   setTimeout(() =>{
+//     if(Date.now() - now >= TTL_MAX_AGE){
+//       console.log('[Process TTL] process.exit by TTL end.' + timeFormat());
+//       normalExit();
+//     }else{
+//       TTL();
+//     }
+//   }, TTL_MAX_AGE);
+// }
 
-const TTL = function(){
-  setTimeout(() =>{
-    if(Date.now() - now >= TTL_MAX_AGE){
-      console.log('[Process TTL] process.exit by TTL end.' + timeFormat());
-      normalExit();
-    }else{
-      TTL();
-    }
-  }, TTL_MAX_AGE);
-}
-
-app.use(function(req, res, next){
-  now = Date.now();
-  next();
-});
+// app.use(function(req, res, next){
+//   now = Date.now();
+//   next();
+// });
 //================= 用户进程 TTL end =================
 
 
@@ -84,18 +107,14 @@ app.get('/live', function(req, res){
   res.send('Y');
 });
 
-const desktop = require('./api/desktop');
 
+app.use('/time', middleWare.preventUnxhr, time);
 app.use('/desktop', middleWare.preventUnxhr, desktop);
 
 // sys apps
-const serverInfo = require('./api/server-info');
-const recycleBin = require('./api/dustbin');
-const fsApi = require('./api/fs');
-const disk = require('./api/disk');
 
 app.use('/fs', fsApi); // preventUnxhr inner.
-const eStatic = require('express').static;
+
 app.use('/fs', eStatic('/', {dotfiles: 'allow', maxAge: 0}));
 app.get('/disk',middleWare.preventUnxhr, disk);
 app.use('/serverInfo', middleWare.preventUnxhr, serverInfo);
@@ -120,10 +139,12 @@ server.listen(PORT);
 server.on('listening', onListening(server, function(){
   execSync('chmod 600 ' + PORT);
   console.log(FLAG);
-  TTL();
 }));
 
-server.on('error', onError);
+server.on('error', function(port) {
+  console.log(ERROR_FLAG);
+  onError(port);
+});
 
 
 
@@ -132,5 +153,5 @@ function normalExit(){
   process.exit();
 }
 
-const { createPtyServer } = require('./lib/pty');
+
 createPtyServer(server);
