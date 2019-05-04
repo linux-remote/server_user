@@ -2,7 +2,7 @@
 // Copyright and modify form: https://github.com/xtermjs/xterm.js/blob/master/demo/server.js
 
 const pty = require('node-pty');
-const { terminals, logs } = require('../lib/pty');
+const { terminals, logs } = require('./store');
 
 
 // 

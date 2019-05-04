@@ -29,3 +29,9 @@ exports.fsGetOrInit = function (filePath, data, callback){
   })
 }
 
+exports.safeSend = function(ws, msg) {
+  if(ws.readyState === 1) {
+    ws.send(msg);
+  }
+}
+

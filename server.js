@@ -27,16 +27,15 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const { onListening, onError } = require('./lib/util');
 
-const ps = require('./api/ps');
 const serverInfo = require('./api/server-info');
 const recycleBin = require('./api/dustbin');
 const fsApi = require('./api/fs');
 const disk = require('./api/disk');
 const eStatic = require('express').static;
-const { createPtyServer } = require('./lib/pty');
+const createWsSerever = require('./ws-server');
 const middleWare = require('./common/middleware');
 const upload = require('./api/upload');
-const terminal = require('./api/terminal');
+const terminals = require('./api/terminals/terminals');
 const desktop = require('./api/desktop');
 const time = require('./api/time');
 
@@ -57,7 +56,7 @@ if(!IS_PRO) {
   app.use(logger('dev'));
 }
 
-terminal(app);
+terminals(app);
 
 app.use('/upload', middleWare.preventUnxhr, upload);
 
@@ -119,7 +118,6 @@ app.use('/fs', eStatic('/', {dotfiles: 'allow', maxAge: 0}));
 app.get('/disk',middleWare.preventUnxhr, disk);
 app.use('/serverInfo', middleWare.preventUnxhr, serverInfo);
 app.use('/recycleBin', middleWare.preventUnxhr, recycleBin);
-app.get('/ps', middleWare.preventUnxhr, ps);
 app.delete('/exit', function(req, res){
   res.send('exit');
   res.on('finish', function(){
@@ -154,4 +152,4 @@ function normalExit(){
 }
 
 
-createPtyServer(server);
+createWsSerever(server);
