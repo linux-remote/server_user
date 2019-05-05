@@ -38,11 +38,12 @@ wsServer.on('connection', function connection(ws, req) {
   const send = buffer(ws, 5);
 
   term.on('data', function(data) {
-    try {
-      send(data);
-    } catch (ex) {
-      // The WebSocket is not open, ignore
-    }
+    send(data);
+    // try {
+      
+    // } catch (ex) {
+    //   // The WebSocket is not open, ignore
+    // }
   });
   ws.on('message', function(msg) {
     term.write(msg);

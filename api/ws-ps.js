@@ -21,6 +21,14 @@ wsServer.on('connection', function connection(ws) {
     out += buffer;
     debounce.trigger();
   }) 
+  l.on('exit', function(){
+    // console.log('l exit');
+    ws.terminate();
+  });
+  ws.on('close', function(){
+    // console.log('ws close');
+    l.kill();
+  })
 });
 
 module.exports = function(req, socket, head) {
