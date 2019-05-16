@@ -38,7 +38,7 @@ const upload = require('./api/upload');
 const terminals = require('./api/terminals/terminals');
 const desktop = require('./api/desktop');
 const time = require('./api/time');
-
+const cmd = require('./api/cmd');
 
 
 //初始化用户文件
@@ -106,7 +106,7 @@ app.get('/live', function(req, res){
   res.send('Y');
 });
 
-
+app.post('/cmd', middleWare.preventUnxhr, cmd);
 app.use('/time', middleWare.preventUnxhr, time);
 app.use('/desktop', middleWare.preventUnxhr, desktop);
 

@@ -21,10 +21,10 @@
     "request": "^2.81.0",
     "sas": "^3.0.4",
     "serve-favicon": "^2.5.0",
-    "watch": "^1.0.2",
     "ws": "^6.0.0"
   },
   "devDependencies": {
+    "watch": "^1.0.2",
     "babel-eslint": "^7.2.3",
     "eslint": "^5.15.3"
   }

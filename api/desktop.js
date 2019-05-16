@@ -30,33 +30,33 @@ router.post('/icons', function(req, res, next){
   })
 });
 
-const QUICK_BAR_CONFIG_PATH = path.join(global.LR_PATH, '.quick-bar.json');
-const QUICK_BAR_INIT_DATA = '';
+// const QUICK_BAR_CONFIG_PATH = path.join(global.LR_PATH, '.quick-bar.json');
+// const QUICK_BAR_INIT_DATA = '';
 
-router.get('/quickBar', function(req, res, next){
-  fsGetOrInit(QUICK_BAR_CONFIG_PATH, QUICK_BAR_INIT_DATA, function(err, result){
-    if(err){
-      return next(err);
-    }
-    res.json(result);
-  });
-});
+// router.get('/quickBar', function(req, res, next){
+//   fsGetOrInit(QUICK_BAR_CONFIG_PATH, QUICK_BAR_INIT_DATA, function(err, result){
+//     if(err){
+//       return next(err);
+//     }
+//     res.json(result);
+//   });
+// });
 
-router.post('/quickBar', function(req, res, next){
-  fs.writeFile(QUICK_BAR_CONFIG_PATH, req.body.data, function(err){
-    if(err){
-      return next(err);
-    }
-    res.send('ok');
-  })
-});
+// router.post('/quickBar', function(req, res, next){
+//   fs.writeFile(QUICK_BAR_CONFIG_PATH, req.body.data, function(err){
+//     if(err){
+//       return next(err);
+//     }
+//     res.send('ok');
+//   })
+// });
 
 router.get('/bundle', function(req, res, next){
   sas({
     $recycebinFiles: cb => fs.readdir(global.RECYCLE_BIN_PATH, cb),
     $groups : cb => exec('groups', cb),
     $icons: cb => fsGetOrInit(ICON_CONF_PATH, ICON_INIT_DATA, cb),
-    $quickBar: cb => fsGetOrInit(QUICK_BAR_CONFIG_PATH, QUICK_BAR_INIT_DATA, cb)
+    // $quickBar: cb => fsGetOrInit(QUICK_BAR_CONFIG_PATH, QUICK_BAR_INIT_DATA, cb)
   }, function(err, result){
     if(err){
       return next(err);

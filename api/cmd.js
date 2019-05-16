@@ -1,17 +1,20 @@
 const exec = require('child_process').exec;
 
 module.exports = function(req, res, next){
-  console.log('req.body', req.body, 'cwd2', req.PATH);
-  exec(req.body.cmd, {env : process.env, cwd: req.PATH}, function(err, stdout, stderr) {
-    console.error('execexecexec');
+  let opts = {env : process.env};
+  if(req.body.cwd){
+    opts.cwd = req.body.cwd;
+  }
+  exec(req.body.cmd, opts, function(err, stdout, stderr) {
     if(err) {
-      console.error('err', err);
       return next(err);
+    } else {
+      if(stderr){
+        res.status(500).send(stderr);
+      } else {
+        res.send(stdout);
+      }
     }
-    console.log('stderr', stderr);
-    res.send({
-      stdout,
-      stderr
-    });
+    
   });
 }

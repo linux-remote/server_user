@@ -7,15 +7,13 @@ const {wrapPath} = require('./util');
 const { ensureUniqueId, preventUnxhr } = require('../lib/util');
 const {_reGetItem} = require('./common');
 const ls = require('./ls');
-const cmd = require('./cmd');
 
 const bodyMap = {
   createSymbolicLink,
   rename,
   createFile,
   createFolder,
-  checkCover,
-  cmd
+  checkCover
 }
 
 function fsSys(req, res, next){
