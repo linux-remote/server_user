@@ -7,13 +7,16 @@ const {wrapPath} = require('./util');
 const { ensureUniqueId, preventUnxhr } = require('../lib/util');
 const {_reGetItem} = require('./common');
 const ls = require('./ls');
+const { cutAndCopy } = require('./fs/moveAndCopy');
 
 const bodyMap = {
   createSymbolicLink,
   rename,
   createFile,
   createFolder,
-  checkCover
+  checkCover,
+  copy: cutAndCopy,
+  cut: cutAndCopy
 }
 
 function fsSys(req, res, next){
