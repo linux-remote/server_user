@@ -4,10 +4,10 @@ var multer = require('multer');
 var tmpDir = require('os').tmpdir();
 var path = require('path');
 var fs = require('fs');
-var exec = require('child_process').exec;
-const {wrapPath} = require('./util');
+const {execComplete} = require('../child-exec');
+const {wrapPath} = require('../util');
 const prevTmpName = path.basename(process.env.PORT, '.sock');
-const {_reGetItem} = require('./common');
+const ls = require('./ls');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -34,15 +34,17 @@ router.put('*',  function(req, res, next){
       return next(err);
     }
     req.PATH = decodeURIComponent(req.path);
-    req._itemPath = path.join(req.PATH, req._originalname);
-
-    exec(`mv ${req.tmpPath} ${wrapPath(req._itemPath)}`, function(err){
+    const warpedItemPath = wrapPath(req._originalname);
+    execComplete(`mv ${req.tmpPath} ${warpedItemPath}`,  function(err){
       if(err){
         return next(err);
       }
-      // console.log('_itemPath', req.tmpPath)
-      _reGetItem(req, res, next);
-    })
+      req._cmd_ls_opts = {
+        self: warpedItemPath,
+        _isSelfWrap: true
+      }
+      ls(req, res);
+    }, req.PATH);
   })
 
 });

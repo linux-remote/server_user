@@ -5,9 +5,8 @@ const sas = require('sas');
 const path = require('path');
 const {wrapPath} = require('./util');
 const { ensureUniqueId, preventUnxhr } = require('../lib/util');
-const {_reGetItem} = require('./common');
 const { cutAndCopy } = require('./fs/moveAndCopy');
-const readDirStream = require('./fs/ls');
+const lsStream = require('./fs/ls');
 const createSymbolicLink = require('./fs/sym-link');
 
 const bodyMap = {
@@ -33,7 +32,7 @@ function fsSys(req, res, next){
       if(preventUnxhr(req, res)){
         return;
       }
-      readDirStream(req, res);
+      lsStream(req, res);
       return;
     }else{
       //console.log('req.path', req.PATH, path.basename(req.PATH))
@@ -134,9 +133,11 @@ function createFolder(req, res, next){
       return next(err);
     }
 
-    req._itemPath = _path;
-    _reGetItem(req, res, next);
-    
+    req._cmd_ls_opts = {
+      self: req.body.name
+    }
+    lsStream(req, res);
+
   })
 }
 
@@ -147,8 +148,11 @@ function updateFile(req, res, next){
       return next(err);
     }
 
-    req._itemPath = req.PATH;
-    _reGetItem(req, res, next);
+    req._cmd_ls_opts = {
+      self: req.PATH,
+      cwd: null
+    }
+    lsStream(req, res);
   });
 }
 
@@ -159,8 +163,10 @@ function createFile(req, res, next){
       return next(err);
     }
 
-    req._itemPath = _path;
-    _reGetItem(req, res, next);
+    req._cmd_ls_opts = {
+      self: req.body.name
+    }
+    lsStream(req, res);
   });
 }
 
