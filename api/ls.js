@@ -43,7 +43,6 @@ function ls(_raw_path, opts, callback){
           name = v[1];
           name = name.replace(INTERVAL_REG, '"');
           name = name.replace(/\\\\|\\n|\\t|\\r|\\f|\\v/g, function(mstr){
-            console.log(mstr)
             switch(mstr){
               case '\\\\':
                 return '\\';

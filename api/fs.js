@@ -6,8 +6,9 @@ const path = require('path');
 const {wrapPath} = require('./util');
 const { ensureUniqueId, preventUnxhr } = require('../lib/util');
 const {_reGetItem} = require('./common');
-const ls = require('./ls');
 const { cutAndCopy } = require('./fs/moveAndCopy');
+const readDirStream = require('./fs/ls');
+const createSymbolicLink = require('./fs/sym-link');
 
 const bodyMap = {
   createSymbolicLink,
@@ -32,7 +33,8 @@ function fsSys(req, res, next){
       if(preventUnxhr(req, res)){
         return;
       }
-      return readDir(req, res, next);
+      readDirStream(req, res);
+      return;
     }else{
       //console.log('req.path', req.PATH, path.basename(req.PATH))
       if(req.query.download){
@@ -87,17 +89,7 @@ function checkCover(req, res, next){
   })
 }
 
-function createSymbolicLink(req, res, next){
-  const {name} = req.body;
-  let _newPath = path.dirname(req.PATH);
-  _newPath = path.join(_newPath, name);
-  exec('ln -s ' + wrapPath(req.PATH) + ' ' + wrapPath(_newPath), (err) => {
-    if(err) return next(err);
 
-    req._itemPath = _newPath;
-    _reGetItem(req, res, next);
-  })
-}
 
 function rename(req, res, next){
   const {oldName, newName} = req.body;
@@ -172,12 +164,5 @@ function createFile(req, res, next){
   });
 }
 
-
-function readDir(req, res, next){
-  ls(req.PATH, (err, result) => {
-    if(err) return next(err);
-    res.json(result);
-  })
-}
 
 module.exports = fsSys;

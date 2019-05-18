@@ -1,15 +1,23 @@
 const { exec } = require('child_process');
-const path = require('path');
-const sas = require('sas');
+// const path = require('path');
+// const fs = require('fs');
 
 exports.cutAndCopy = function _cutAndCopy(req, res, next){
   const data = req.body;
   console.log('data', data);
   if(data.type === 'copy')  {
     if(data.isCopyOneOnSameDir) {
-      exec(`cp ${data.srcFile} ${data.destName}`, {cwd: req.PATH}, function(err){
+      // -i 提示
+      // -n 不覆盖
+      const cmd = `cp -a -n ${data.srcFile} ${data.destFile}`;
+      // console.log('cmd', cmd);
+      // 未做即时校验, 直接 -n 不覆盖
+      exec(cmd, {cwd: req.PATH}, function(err, stdout, stderr){
         if(err){
           return next(err);
+        }
+        if(stderr){
+          return res.status(500).send(stderr);
         }
         res.send('ok');
       });
