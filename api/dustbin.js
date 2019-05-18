@@ -49,3 +49,47 @@ router.delete('/', function(req, res, next){
 });
 
 module.exports = router;
+
+
+// ls(global.RECYCLE_BIN_PATH, 
+//   {noDir: true, other: '--reverse'}, 
+//     (err, result) => {
+//       if(err){
+//         return next(err);
+//       }
+//       const result2 = [];
+//       var map = Object.create(null);
+//       result.forEach((v) => {
+//         let key, isSource, lastIndex = v.name.lastIndexOf('.lnk');
+//         if(lastIndex === -1){
+//           key = v.name;
+//           isSource = true;
+//         }else{
+//           key = v.name.substr(0, lastIndex);
+//           let linkTarget = v.symbolicLink;
+//           let pathObj = path.parse(linkTarget.linkPath);
+//           v = {
+//             delTime: v.mtime,
+//             sourceDir: pathObj.dir,
+//             name: pathObj.base,
+//             isCover: !linkTarget.linkTargetError
+//           }
+//         }
+
+//         if(!map[key]){
+//           map[key] = {
+//             id: key
+//           };
+//           result2.push(map[key]);
+//         }
+//         if(isSource){
+//           delete(v.name);
+//           map[key].source = v;
+//         }else {
+//           Object.assign(map[key], v);
+//         }
+//         //map[key][subKey] = v;
+//       });
+//       map = null;
+//       res.json(result2);
+//     })

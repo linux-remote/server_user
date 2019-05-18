@@ -23,8 +23,7 @@ function genCmd(opts) {
   if(opts.noDir){ //去掉 . 和 ..
     a = ' -A';
   }
-
-  const cmd = `ls -f -l --color=none -Q --time-style='+%Y-%m-%d %H:%M:%S'${a}${d}${self}`;
+  const cmd = `ls -f -l --color=none -Q --ignore='..' --time-style='+%Y-%m-%d %H:%M:%S'${a}${d}${self}`;
   return cmd;
 }
 
