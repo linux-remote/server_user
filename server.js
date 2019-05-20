@@ -25,15 +25,16 @@ const http = require('http');
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const { onListening, onError } = require('./lib/util');
-
-const serverInfo = require('./api/server-info');
-const recycleBin = require('./api/dustbin');
-const fsApi = require('./api/fs');
-const disk = require('./api/disk');
 const eStatic = require('express').static;
+
+const { onListening, onError } = require('./lib/util');
 const createWsSerever = require('./ws-server');
 const middleWare = require('./common/middleware');
+
+const serverInfo = require('./api/server-info');
+const recycleBin = require('./api/recycle-bin');
+const fsApi = require('./api/fs');
+const disk = require('./api/disk');
 const upload = require('./api/fs/upload');
 const terminals = require('./api/terminals/terminals');
 const desktop = require('./api/desktop');

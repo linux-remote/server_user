@@ -1,5 +1,6 @@
 const sas = require('sas');
 const {exec} = require('child_process');
+const path = require('path');
 const {execComplete} = require('../child-exec');
 const { ensureUniqueId } = require('../../lib/util');
 const {wrapPath} = require('../util');
@@ -14,8 +15,7 @@ function mvToRecycleBin(req, res, next){
   const tasks = Object.create(null);
 
   files.forEach((filename, i) => {
-
-    const wrapedName = wrapPath(filename);
+    const wrapedPath = wrapPath(path.join(req.PATH, filename));
     let dustPath;
 
     const genDustPath = cb => {
@@ -23,13 +23,13 @@ function mvToRecycleBin(req, res, next){
         if(err){
           return cb(err);
         }
-        dustPath = global.RECYCLE_BIN_PATH + '/' + uniqueId;
+        dustPath = wrapPath(uniqueId);
         cb();
       });
     }
 
-    const link = cb => execComplete(`ln -s ${wrapedName} ${dustPath}.lnk`, cb, req.PATH);
-    const move = cb => execComplete(`mv ${wrapedName} ${dustPath}`, cb, req.PATH);
+    const link = cb => execComplete(`ln -s ${wrapedPath} ${dustPath}.lnk`, cb,global.RECYCLE_BIN_PATH);
+    const move = cb => execComplete(`mv ${wrapedPath} ${dustPath}`, cb, global.RECYCLE_BIN_PATH);
     tasks[i] = [genDustPath, move, link];
   });
 

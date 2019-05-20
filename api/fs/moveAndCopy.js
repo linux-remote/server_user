@@ -2,14 +2,14 @@
 const {execComplete} = require('../child-exec');
 const { wrapPath } = require('../util');
 const path = require('path');
-const {checkOneCover, checkCoverByReaddir} = require('../../lib/fs-check-cover');
+const {checkCoverByLstat, checkCoverByReaddir} = require('../../lib/fs-check-cover');
 // const fs = require('fs');
 
 exports.cutAndCopy = function _cutAndCopy(req, res, next){
   const data = req.body;
   
   if(data.isCopyOneOnSameDir) {
-    checkOneCover(path.join(req.PATH, data.destFile), function(err){
+    checkCoverByLstat(path.join(req.PATH, data.destFile), function(err){
       if(err) {
         return next(err);
       }

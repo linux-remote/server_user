@@ -1,51 +1,71 @@
 var express = require('express');
 var router = express.Router();
-const {exec} = require('child_process');
+const {execComplete} = require('./child-exec');
 const sas = require('sas');
 const path = require('path');
 const ls = require('./fs/ls');
 const {wrapPath} = require('./util');
+const {checkCoverByLstat} = require('../lib/fs-check-cover');
 
 router.get('/', function(req, res){
-  req._cmd_ls_opts = {noDir: true};
+
   req.PATH = global.RECYCLE_BIN_PATH;
+  req._cmd_ls_opts = {
+    noDir: true
+  };
   ls(req, res);
 })
 
-router.post('/recycle', function(req, res, next){
-  const item = req.body;
-  const name = item.id;
-  const sourceDir = item.sourceDir;
-  const filePath = wrapPath(`${sourceDir}/${item.name}`);
-  sas({
-    mv: cb => exec(`mv ${global.RECYCLE_BIN_PATH}/${name} ${filePath}`, cb),
-    delLnk: cb => exec(`rm -rf ${global.RECYCLE_BIN_PATH}/${name}.lnk`, cb)
-  }, (err) => {
-    if(err) return next(err);
-    res.json();
-  })
+router.post('/restore', function(req, res, next){
+  const data = req.body;
+
+
+  const srcFilePath = data.sourcePath;
+
+  
+
+  checkCoverByLstat(srcFilePath, function(err) {
+    if(err){
+      return next(err);
+    }
+
+    const id = wrapPath(data.id);
+
+    sas({
+      mv: cb => execComplete(`mv -n ${id} ${wrapPath(srcFilePath)}`, cb, global.RECYCLE_BIN_PATH),
+      delLnk: cb => execComplete(`rm -rf ${id}.lnk`, cb, global.RECYCLE_BIN_PATH)
+    }, (err) => {
+      if(err){
+        return next(err);
+      }
+      res.end('ok');
+    });
+  });
+
 });
 
-router.delete('/:name', function(req, res, next){
-  const name = req.params.name;
+router.delete('/:id', function(req, res, next) {
+  const id = wrapPath(req.params.id);
   sas({
-    del: cb => exec(`rm -rf ${global.RECYCLE_BIN_PATH}/${name}`, cb),
-    delLnk: cb => exec(`rm -rf ${global.RECYCLE_BIN_PATH}/${name}.lnk`, cb)
+    del: cb => execComplete(`rm -rf ${id}`, cb, global.RECYCLE_BIN_PATH),
+    delLnk: cb => execComplete(`rm -rf ${id}.lnk`, cb, global.RECYCLE_BIN_PATH)
   }, (err) => {
-    if(err) return next(err);
-    res.end('ok');
-  })
-});
-
-router.delete('/', function(req, res, next){
-  exec(`rm -rf ${global.RECYCLE_BIN_PATH}/*`, err => {
-    if(err) return next(err);
+    if(err) {
+      return next(err);
+    }
     res.end('ok');
   });
-  // fs.readdir(global.RECYCLE_BIN_PATH, (err, files){
-  //   if(err) return next(err);
-  //   files.map()
-  // })
+});
+
+router.delete('/', function(req, res, next) {
+  execComplete(`rm -rf ./*`, (err) => {
+    if(err) {
+      return next(err);
+    }
+
+    res.end('ok');
+
+  }, global.RECYCLE_BIN_PATH);
 });
 
 module.exports = router;
