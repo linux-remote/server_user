@@ -1,14 +1,14 @@
 // const os = require('os');
-const {exec} = require('child_process');
+
 const fs = require('fs');
-const sas = require('sas');
+
 const path = require('path');
-const {wrapPath} = require('./util');
-const { ensureUniqueId, preventUnxhr } = require('../lib/util');
+
+const { preventUnxhr } = require('../lib/util');
 const { cutAndCopy } = require('./fs/moveAndCopy');
 const lsStream = require('./fs/ls');
 const createSymbolicLink = require('./fs/sym-link');
-
+const del = require('./fs/del');
 const bodyMap = {
   createSymbolicLink,
   rename,
@@ -16,7 +16,8 @@ const bodyMap = {
   createFolder,
   checkCover,
   copy: cutAndCopy,
-  cut: cutAndCopy
+  cut: cutAndCopy,
+  del
 }
 
 function fsSys(req, res, next){
@@ -50,9 +51,9 @@ function fsSys(req, res, next){
     return;
   }
 
-  if(method === 'DELETE'){
-    return moveToDustbin(req, res, next);
-  }
+  // if(method === 'DELETE'){
+  //   return moveToDustbin(req, res, next);
+  // }
 
   if(method === 'PUT'){
     return updateFile(req, res, next);
@@ -100,31 +101,6 @@ function rename(req, res, next){
   })
 }
 
-const generateRecycleId = ensureUniqueId(global.RECYCLE_BIN_PATH);
-function moveToDustbin(req, res, next){
-  const _path = req.PATH;
-
-  if(path.dirname(_path) === global.RECYCLE_BIN_PATH){
-    return deleteAll(req, res, next);
-  }
-
-  const dustPath = global.RECYCLE_BIN_PATH + '/' + generateRecycleId();
-  const wrapedPath = wrapPath(_path);
-  //const checkUnique = cb => fs.stat()
-  const link = cb => exec(`ln -s ${wrapedPath} ${dustPath}.lnk`, cb);
-  const move = cb => exec(`mv ${wrapedPath} ${dustPath}`, cb);
-  sas([move, link], function(err){
-    if(err) return next(err);
-    res.end('ok');
-  })
-}
-
-function deleteAll(req, res, next){
-  exec('rm -rf ' + wrapPath(req.PATH), function(err){
-    if(err) return next(err);
-    res.end('ok');
-  })
-}
 
 function createFolder(req, res, next){
   const _path = path.join(req.PATH, req.body.name);

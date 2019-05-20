@@ -1,6 +1,6 @@
 // on Sep 22, 2018 copyright https://github.com/hezedu/SomethingBoring/blob/master/algorithm/DebounceTime.js
-// unmidify
-
+// unmodify
+// 1.0
 function DebounceTime(callback, dealy){
   this.go = callback;
   this.dealy = dealy;
