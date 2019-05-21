@@ -123,12 +123,7 @@ function updateFile(req, res, next){
     if(err){
       return next(err);
     }
-
-    req._cmd_ls_opts = {
-      self: req.PATH,
-      cwd: null
-    }
-    lsStream(req, res);
+    res.end('ok');
   });
 }
 
