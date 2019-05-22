@@ -43,7 +43,7 @@ router.put('*',  function(req, res, next){
         self: warpedItemPath,
         _isSelfWrap: true
       }
-      ls(req, res);
+      ls(req, res, next);
     }, req.PATH);
   })
 

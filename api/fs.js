@@ -6,7 +6,7 @@ const path = require('path');
 
 const { preventUnxhr } = require('../lib/util');
 const { cutAndCopy } = require('./fs/moveAndCopy');
-const lsStream = require('./fs/ls');
+const ls = require('./fs/ls');
 const createSymbolicLink = require('./fs/sym-link');
 const del = require('./fs/del');
 const bodyMap = {
@@ -33,7 +33,7 @@ function fsSys(req, res, next){
       if(preventUnxhr(req, res)){
         return;
       }
-      lsStream(req, res);
+      ls(req, res, next);
       return;
     }else{
       //console.log('req.path', req.PATH, path.basename(req.PATH))
@@ -96,7 +96,9 @@ function rename(req, res, next){
   const oldPath = path.join(req.PATH, oldName);
   const newPath = path.join(req.PATH, newName);
   fs.rename(oldPath, newPath, function(err){
-    if(err) return next(err);
+    if(err) {
+      return next(err);
+    }
     res.end('ok');
   })
 }
@@ -112,7 +114,7 @@ function createFolder(req, res, next){
     req._cmd_ls_opts = {
       self: req.body.name
     }
-    lsStream(req, res);
+    ls(req, res, next);
 
   })
 }
@@ -123,13 +125,20 @@ function updateFile(req, res, next){
     if(err){
       return next(err);
     }
-    res.end('ok');
+    const parsedPath = path.parse(req.PATH);
+    req._cmd_ls_opts = {
+      self: parsedPath.base,
+      cwd: parsedPath.dir
+    }
+    ls(req, res, next);
   });
 }
 
 function createFile(req, res, next){
-  const _path = path.join(req.PATH, req.body.name);
-  fs.writeFile(_path, '', err => {
+  const filePath = path.join(req.PATH, req.body.name);
+  fs.writeFile(filePath, req.body.content || '', {
+    flag: 'wx'
+  }, err => {
     if(err){
       return next(err);
     }
@@ -137,7 +146,7 @@ function createFile(req, res, next){
     req._cmd_ls_opts = {
       self: req.body.name
     }
-    lsStream(req, res);
+    ls(req, res, next);
   });
 }
 

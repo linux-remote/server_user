@@ -1,5 +1,5 @@
 const {execComplete} = require('../child-exec');
-const lsStream = require('./ls');
+const ls = require('./ls');
 const {wrapPath} = require('../util');
 module.exports = function createSymbolicLink(req, res, next){
   const {srcName, newName} = req.body;
@@ -14,7 +14,7 @@ module.exports = function createSymbolicLink(req, res, next){
       self: warpNewName,
       _isSelfWrap : true
     };
-    lsStream(req, res, req.PATH);
+    ls(req, res, next);
 
   }, req.PATH);
 }

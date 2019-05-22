@@ -16,7 +16,7 @@ exports.execComplete = function(cmd, callback, cwd) {
     }
     if(stderr)  {
       callback({
-        name: `execError`,
+        name: `childExecError`,
         message: stderr
       });
     } else {

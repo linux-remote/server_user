@@ -7,13 +7,13 @@ const ls = require('./fs/ls');
 const {wrapPath} = require('./util');
 const {checkCoverByLstat} = require('../lib/fs-check-cover');
 
-router.get('/', function(req, res){
+router.get('/', function(req, res, next){
 
   req.PATH = global.RECYCLE_BIN_PATH;
   req._cmd_ls_opts = {
     noDir: true
   };
-  ls(req, res);
+  ls(req, res, next);
 })
 
 router.post('/restore', function(req, res, next){
