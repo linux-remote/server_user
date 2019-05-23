@@ -29,7 +29,7 @@ function mvToRecycleBin(req, res, next){
     }
 
     const link = cb => execComplete(`ln -s ${wrapedPath} ${dustPath}.lnk`, cb,global.RECYCLE_BIN_PATH);
-    const move = cb => execComplete(`mv ${wrapedPath} ${dustPath}`, cb, global.RECYCLE_BIN_PATH);
+    const move = cb => execComplete(`mv -- ${wrapedPath} ${dustPath}`, cb, global.RECYCLE_BIN_PATH);
     tasks[i] = [genDustPath, move, link];
   });
 

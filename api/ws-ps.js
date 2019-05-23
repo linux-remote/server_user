@@ -12,6 +12,8 @@ wsServer.on('connection', function connection(ws) {
   const l = spawn('top', ['-b']);
   let out = '';
   const debounce = new DebounceTime(function(){
+    // 最后换行 \n 判定?
+    // if(out[out.length])
     zlib.gzip(out, function(err, result){
       if(err){
         ws.close(1000, err.message);

@@ -35,7 +35,7 @@ router.put('*',  function(req, res, next){
     }
     req.PATH = decodeURIComponent(req.path);
     const warpedItemPath = wrapPath(req._originalname);
-    execComplete(`mv ${req.tmpPath} ${warpedItemPath}`,  function(err){
+    execComplete(`mv -- ${req.tmpPath} ${warpedItemPath}`,  function(err){
       if(err){
         return next(err);
       }

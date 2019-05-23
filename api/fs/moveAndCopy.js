@@ -3,8 +3,8 @@ const {execComplete} = require('../child-exec');
 const { wrapPath } = require('../util');
 const path = require('path');
 const {checkCoverByLstat, checkCoverByReaddir} = require('../../lib/fs-check-cover');
-// const fs = require('fs');
-
+// -- options:
+// https://www.linuxquestions.org/questions/linux-software-2/problem-with-mv-and-cp-771043/
 exports.cutAndCopy = function _cutAndCopy(req, res, next){
   const data = req.body;
   
@@ -13,10 +13,8 @@ exports.cutAndCopy = function _cutAndCopy(req, res, next){
       if(err) {
         return next(err);
       }
-      // -n 不覆盖
-      const cmd = `cp -a -n ${wrapPath(data.srcFile)} ${wrapPath(data.destFile)}`;
-      // console.log('cmd', cmd);
-      // 未做即时校验, 直接 -n 不覆盖
+      // -- 不覆盖
+      const cmd = `cp -a -- ${wrapPath(data.srcFile)} ${wrapPath(data.destFile)}`;
       execComplete(cmd, function(err){
         if(err){
           return next(err);
@@ -43,16 +41,14 @@ exports.cutAndCopy = function _cutAndCopy(req, res, next){
       let cmd;
       switch(data.type){
         case 'copy': 
-          cmd = `cp -a -n ${fullFiles.join(' ')} ./`;
+          cmd = `cp -a -- ${fullFiles.join(' ')} ./`;
           break;
         case 'cut': 
-          cmd = `mv -n ${fullFiles.join(' ')} ./`;
+          cmd = `mv -- ${fullFiles.join(' ')} ./`;
           break;
         default:
           return res.status(500).send('lr-user-server: unsupport type: ' + data.type);
       }
-      // console.log('cmd', cmd);
-      // 未做即时校验, 直接 -n 不覆盖
       execComplete(cmd, function(err){
         if(err){
           return next(err);

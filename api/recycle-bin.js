@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 const {execComplete} = require('./child-exec');
 const sas = require('sas');
-const path = require('path');
 const ls = require('./fs/ls');
 const {wrapPath} = require('./util');
 const {checkCoverByLstat} = require('../lib/fs-check-cover');
@@ -32,7 +31,7 @@ router.post('/restore', function(req, res, next){
     const id = wrapPath(data.id);
 
     sas({
-      mv: cb => execComplete(`mv -n ${id} ${wrapPath(srcFilePath)}`, cb, global.RECYCLE_BIN_PATH),
+      mv: cb => execComplete(`mv -n -- ${id} ${wrapPath(srcFilePath)}`, cb, global.RECYCLE_BIN_PATH),
       delLnk: cb => execComplete(`rm -rf ${id}.lnk`, cb, global.RECYCLE_BIN_PATH)
     }, (err) => {
       if(err){
