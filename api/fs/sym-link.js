@@ -4,7 +4,7 @@ const {wrapPath} = require('../util');
 module.exports = function createSymbolicLink(req, res, next){
   const {srcName, newName} = req.body;
   const warpNewName = wrapPath(newName);
-  const cmd = `ln -s ${wrapPath(srcName)} ${warpNewName}`;
+  const cmd = `ln -s -- ${wrapPath(srcName)} ${warpNewName}`;
   // console.//log('createSymbolicLink cmd', cmd);
   execComplete(cmd, function(err){
     if(err){
