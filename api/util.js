@@ -1,13 +1,15 @@
 const fs = require('fs');
 function escapePath(str){
   str = str.replace(/\\/g, '\\\\');
-  return str.replace(/"/g, '\\"'); 
+  return str.replace(/'/g, function(mstr){
+    return '\\' + mstr;
+  });
 }
 // exports.escapePath = escapePath;
 
 exports.wrapPath = function(str){
   str = escapePath(str);
-  return `"${str}"`;
+  return `'${str}'`;
 }
 
 exports.fsGetOrInit = function (filePath, data, callback){
