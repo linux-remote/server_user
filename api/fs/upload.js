@@ -1,50 +1,53 @@
 var express = require('express');
 var router = express.Router();
 var multer = require('multer');
-var tmpDir = require('os').tmpdir();
+// var tmpDir = require('os').tmpdir();
 var path = require('path');
-var fs = require('fs');
-const {execComplete} = require('../child-exec');
-const {wrapPath} = require('../util');
-const prevTmpName = path.basename(process.env.PORT, '.sock');
+// var fs = require('fs');
+// const {execComplete} = require('../child-exec');
+// const {wrapPath} = require('../util');
+// const prevTmpName = path.basename(process.env.PORT, '.sock');
 const ls = require('./ls');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, tmpDir);
+    cb(null, req.PATH);
   },
   filename: function (req, file, cb) {
     req._originalname = file.originalname;
-    var tmpName = 'lr-upload-tmp' +  prevTmpName + Date.now();
-    req.tmpPath = path.join(tmpDir, tmpName);
-    cb(null, tmpName);
+    // var tmpName = 'lr-upload-tmp' +  prevTmpName + Date.now();
+    req._destination_path = path.join(req.PATH, req._originalname);
+    cb(null, file.originalname);
   }
 })
 
 var upload = multer({storage}).single('file');
 
-router.put('*',  function(req, res, next){
+router.put('*',  function(req, res, next) {
+  
+  req.PATH = decodeURIComponent(req.path);
 
-  req.on('aborted', () => {
-    fs.unlink(req.tmpPath);
-  })
+  // req.on('aborted', () => {
+  //   fs.unlink(req._destination_path);
+  // })
   
   upload(req, res, function(err){
     if(err){
       return next(err);
     }
-    req.PATH = decodeURIComponent(req.path);
-    const warpedItemPath = wrapPath(req._originalname);
-    execComplete(`mv -- ${req.tmpPath} ${warpedItemPath}`,  function(err){
-      if(err){
-        return next(err);
-      }
-      req._cmd_ls_opts = {
-        self: warpedItemPath,
-        _isSelfWrap: true
-      }
-      ls(req, res, next);
-    }, req.PATH);
+    // const warpedItemPath = wrapPath(req._originalname);
+    req._cmd_ls_opts = {
+      self: req._originalname,
+      // _isSelfWrap: true
+    }
+    ls(req, res, next);
+
+    // execComplete(`mv -- ${req._destination_path} ${warpedItemPath}`,  function(err){
+    //   if(err){
+    //     return next(err);
+    //   }
+
+    // }, req.PATH);
   })
 
 });
