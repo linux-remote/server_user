@@ -1,8 +1,8 @@
 // const os = require('os');
 const {spawn} = require('child_process');
 const WebSocket = require('ws');
-const {DebounceTime} = require('../common/debounce-time');
-const { safeSend } = require('./util');
+const {DebounceTime} = require('../../common/debounce-time');
+const { safeSend } = require('../util');
 const zlib = require('zlib');
 const wsServer = new WebSocket.Server({ noServer: true });
 

@@ -39,8 +39,7 @@ const upload = require('./api/fs/upload');
 const terminals = require('./api/terminals/terminals');
 const desktop = require('./api/desktop');
 const time = require('./api/time');
-const cmd = require('./api/cmd');
-
+const ps = require('./api/ps/ps');
 
 //初始化用户文件
 execSync('mkdir -m=755 -p ' + global.DESKTOP_PATH);
@@ -107,7 +106,6 @@ app.get('/live', function(req, res){
   res.send('Y');
 });
 
-app.post('/cmd', middleWare.preventUnxhr, cmd);
 app.use('/time', middleWare.preventUnxhr, time);
 app.use('/desktop', middleWare.preventUnxhr, desktop);
 
@@ -119,6 +117,7 @@ app.use('/fs', eStatic('/', {dotfiles: 'allow', maxAge: 0}));
 app.get('/disk',middleWare.preventUnxhr, disk);
 app.use('/serverInfo', middleWare.preventUnxhr, serverInfo);
 app.use('/recycleBin', middleWare.preventUnxhr, recycleBin);
+app.use('/ps', middleWare.preventUnxhr, ps);
 app.delete('/exit', function(req, res){
   res.send('exit');
   res.on('finish', function(){

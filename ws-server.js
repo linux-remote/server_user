@@ -1,6 +1,6 @@
 const url = require('url');
 const terminalHandle = require('./api/terminals/ws-terminal')
-const psHandle = require('./api/ws-ps');
+const psHandle = require('./api/ps/ws-ps');
 
 // const MAX_AGE = 1000 * 60 * 15;
 module.exports = function(server) {
