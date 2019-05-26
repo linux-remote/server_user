@@ -43,14 +43,20 @@ function mvToRecycleBin(req, res, next){
 
 
 function rm_rf(req, res, next){
-  exec('rm -rf ' + wrapPath(req.PATH), function(err){
-    if(err) return next(err);
+  let files = req.body.files;
+  files = files.map(filename => {
+    return wrapPath(filename);
+  });
+  execComplete('rm -rf -- ' + files.join(' '), function(err){
+    if(err){
+      return next(err);
+    }
     res.end('ok');
-  })
+  }, req.PATH)
 }
 
 module.exports = function(req, res, next){
-  if(global.RECYCLE_BIN_PATH === req.PATH) {
+  if(global.RECYCLE_BIN_PATH === req.PATH || req.body.thorough) {
     rm_rf(req, res, next);
   } else {
     mvToRecycleBin(req, res, next);

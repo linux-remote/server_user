@@ -30,7 +30,7 @@ function genCmd(opts) {
   if(opts.self) {
     d = ' -d';
     self = opts._isSelfWrap ? opts.self : wrapPath(opts.self);
-    self = ' ' + self;
+    self = ' -- ' + self;
   }
 
   if(opts.noDir){ //去掉 . 和 ..

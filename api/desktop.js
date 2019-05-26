@@ -69,7 +69,7 @@ router.get('/bundle', function(req, res, next){
       ...result,
       hostname: os.hostname(),
       homedir: os.homedir(),
-      mask: process.umask()
+      // mask: process.umask()
     })
   })
 });
