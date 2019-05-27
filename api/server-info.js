@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const os = require('os');
-const {exec} = require('child_process');
-
+const {execComplete} = require('./child-exec');
 router.get('/', function(req, res, next){
-  exec('cat /etc/issue', (err, result) => {
+  execComplete('cat /etc/issue', (err, result) => {
     if(err) return next(err);
     res.json({
       platform: os.platform(),

@@ -4,7 +4,7 @@ var router = express.Router();
 const os = require('os');
 const path = require('path');
 const fs = require('fs');
-const {exec} = require('child_process');
+const {execComplete} = require('./child-exec');
 const sas = require('sas');
 
 const {fsGetOrInit} = require('./util');
@@ -54,7 +54,7 @@ router.post('/icons', function(req, res, next){
 router.get('/bundle', function(req, res, next){
   sas({
     $recycebinFiles: cb => fs.readdir(global.RECYCLE_BIN_PATH, cb),
-    $groups : cb => exec('groups', cb),
+    $groups : cb => execComplete('groups', cb),
     $icons: cb => fsGetOrInit(ICON_CONF_PATH, ICON_INIT_DATA, cb),
     // $quickBar: cb => fsGetOrInit(QUICK_BAR_CONFIG_PATH, QUICK_BAR_INIT_DATA, cb)
   }, function(err, result){

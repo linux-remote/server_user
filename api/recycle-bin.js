@@ -32,7 +32,7 @@ router.post('/restore', function(req, res, next){
 
     sas({
       mv: cb => execComplete(`mv -n -- ${id} ${wrapPath(srcFilePath)}`, cb, global.RECYCLE_BIN_PATH),
-      delLnk: cb => execComplete(`rm -rf ${id}.lnk`, cb, global.RECYCLE_BIN_PATH)
+      delLnk: cb => execComplete(`rm -rf -- ${id}.lnk`, cb, global.RECYCLE_BIN_PATH)
     }, (err) => {
       if(err){
         return next(err);
@@ -46,8 +46,8 @@ router.post('/restore', function(req, res, next){
 router.delete('/:id', function(req, res, next) {
   const id = wrapPath(req.params.id);
   sas({
-    del: cb => execComplete(`rm -rf ${id}`, cb, global.RECYCLE_BIN_PATH),
-    delLnk: cb => execComplete(`rm -rf ${id}.lnk`, cb, global.RECYCLE_BIN_PATH)
+    del: cb => execComplete(`rm -rf -- ${id}`, cb, global.RECYCLE_BIN_PATH),
+    delLnk: cb => execComplete(`rm -rf -- ${id}.lnk`, cb, global.RECYCLE_BIN_PATH)
   }, (err) => {
     if(err) {
       return next(err);
@@ -57,7 +57,7 @@ router.delete('/:id', function(req, res, next) {
 });
 
 router.delete('/', function(req, res, next) {
-  execComplete(`rm -rf ./*`, (err) => {
+  execComplete(`rm -rf -- ./*`, (err) => {
     if(err) {
       return next(err);
     }

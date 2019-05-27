@@ -1,5 +1,4 @@
 const sas = require('sas');
-const {exec} = require('child_process');
 const path = require('path');
 const {execComplete} = require('../child-exec');
 const { ensureUniqueId } = require('../../lib/util');

@@ -116,7 +116,7 @@ function loop(){
       handleChildCrash();
     }else{
       _colorLog('green', `[Watcher] Child exit success! Watcher exit. \t ${new Date()}`);
-      execSync('rm -rf ' + PORT);
+      execSync('rm -rf -- ' + PORT);
       // execSync('rm -rf  ' + ERROR_LOG_PATH); //清空 error log.
       // execSync('rm -rf  ' + ERROR_LOG_PATH + '.bak'); //清空 error log 备份.
       process.exit(); // 正常退出

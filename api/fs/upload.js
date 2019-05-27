@@ -3,10 +3,6 @@ var router = express.Router();
 var multer = require('multer');
 // var tmpDir = require('os').tmpdir();
 var path = require('path');
-// var fs = require('fs');
-// const {execComplete} = require('../child-exec');
-// const {wrapPath} = require('../util');
-// const prevTmpName = path.basename(process.env.PORT, '.sock');
 const ls = require('./ls');
 
 var storage = multer.diskStorage({

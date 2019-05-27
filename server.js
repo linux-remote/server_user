@@ -5,7 +5,7 @@ const { FLAG, ERROR_FLAG } = require('./lib/util');
 const PORT = process.env.PORT;
 console.log('PORT', PORT);
 if(PORT.indexOf('/linux-remote') !== -1) {
-  execSync('rm -rf ' + PORT); //删除旧的 sock 文件, 才能启动.
+  execSync('rm -rf -- ' + PORT); //删除旧的 sock 文件, 才能启动.
 } else {
   console.error(ERROR_FLAG);
   throw new Error('port is not reasonable');
@@ -42,8 +42,8 @@ const time = require('./api/time');
 const ps = require('./api/ps/ps');
 
 //初始化用户文件
-execSync('mkdir -m=755 -p ' + global.DESKTOP_PATH);
-execSync('mkdir -m=755 -p ' + global.RECYCLE_BIN_PATH);
+execSync('mkdir -m=755 -p -- ' + global.DESKTOP_PATH);
+execSync('mkdir -m=755 -p -- ' + global.RECYCLE_BIN_PATH);
 
 
 
@@ -135,7 +135,7 @@ var server = http.createServer(app);
 server.listen(PORT);
 
 server.on('listening', onListening(server, function(){
-  execSync('chmod 600 ' + PORT);
+  execSync('chmod 600 -- ' + PORT);
   console.log(FLAG);
 }));
 

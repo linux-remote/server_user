@@ -1,5 +1,5 @@
 // const os = require('os');
-const {exec} = require('child_process');
+const {execComplete} = require('./child-exec');
 const THEAD = ['source', 
   'fstype', 
   'size', 
@@ -55,7 +55,7 @@ function parse(stdout){
 // //console.log(parse(testStr));
 // console.log(result);
 module.exports = function(req, res, next){
-  exec(CMD, function(err, result){
+  execComplete(CMD, function(err, result){
     if(err){
       return next(err);
     }
