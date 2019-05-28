@@ -9,12 +9,10 @@ router.get('/', function(req, res, next){
     res.json({
       platform: os.platform(),
       hostname: os.hostname(),
-      uptime: os.uptime(),
       cpus: os.cpus(),
       arch: os.arch(),
       release: os.release(),
       issue: result.trim(),
-      loadavg: os.loadavg(),
       totalmem: os.totalmem(),
       tmpdir: os.tmpdir(),
       endianness: os.endianness(),
