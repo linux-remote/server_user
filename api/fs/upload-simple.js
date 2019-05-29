@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
-// const ls = require('./ls');
-
+const ls = require('./ls');
+const path = require('path');
 // wx
 // w cover  = true
 router.put('*',  function(req, res, next) {
@@ -18,7 +18,12 @@ router.put('*',  function(req, res, next) {
     next(err);
   })
   stream.on('finish', function(){
-    res.type('text').end('ok');
+
+    req._cmd_ls_opts = {
+      self: path.basename(req.PATH),
+      cwd: path.dirname(req.PATH)
+    };
+    ls(req, res, next);
   })
 });
  
