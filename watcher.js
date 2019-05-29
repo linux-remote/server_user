@@ -2,18 +2,21 @@
 
 const {spawn, execSync} = require('child_process');
 const watch = require('watch');
-const path = require('path');
+// const path = require('path');
 const request = require('request');
 
 const PORT = process.env.PORT;
-const BASE_PATH = PORT.substr(0, PORT.lastIndexOf('.'));
-const ERROR_LOG_PATH = BASE_PATH + '-err.log';
+// const BASE_PATH = PORT.substr(0, PORT.lastIndexOf('.'));
+// const ERROR_LOG_PATH = BASE_PATH + '-err.log';
 
 const IS_PRO = process.env.NODE_ENV === 'production';
 
 
 // "chalk" is can't work in `tail -f` on my computer. So..
-var _COLOR_MAP = {red: 31, green: 32, yellow: 33};
+var _COLOR_MAP = {red: 31, 
+  // green: 32, 避免跟 nodemon 冲突.
+  yellow: 33, 
+  cyan: 96};
 function _colorLog(style, str) {
   console.log('\u001b[' + _COLOR_MAP[style] + 'm' + str + '\u001b[39m');
 }
@@ -27,7 +30,7 @@ function _watch(dir){
     ignoreDirectoryPattern: /node_modules/
   }, function(f){
     if(typeof f !== 'object'){
-      console.log('file changed')
+      console.log('[watcher]file changed');
       if(f === process.mainModule.filename){
         return; // 此文件
       }
@@ -45,7 +48,9 @@ if(IS_PRO){
     const liveUrl = 'http://unix:' + process.env.PORT + ':/live';
     var isCheckServerLive = false;
     function checkServerLive(){
-      if(isCheckServerLive) return;
+      if(isCheckServerLive){
+        return;
+      } 
       loop();
       isCheckServerLive = true;
       var count = 0;
@@ -56,7 +61,7 @@ if(IS_PRO){
           request.get(liveUrl, err => {
             if(!err){
               isCheckServerLive = false;
-              _colorLog('green', '[Watcher] checkServerLive: OK');
+              _colorLog('cyan', '[Watcher] checkServerLive: OK');
             }else if(count === 10){
               _colorLog('red', '[Watcher] checkServerLive Timeout. Watcher exit.');
               console.error('EXIT_BY_CHECK_SERVER_LIVE_TIMEOUT');
@@ -83,7 +88,7 @@ if(IS_PRO){
     function loopWhenFileChange(){
       if(fileIsChange){
         isWaitFileChange = false;
-        _colorLog('green', '[Watcher] restarting due to changes...');
+        _colorLog('cyan', '[Watcher] restarting due to changes...');
         loop();
         fileIsChange = false;
       } else {
@@ -115,7 +120,7 @@ function loop(){
       // execSync('cat /dev/null > ' + ERROR_LOG_PATH); //清空 error log.
       handleChildCrash();
     }else{
-      _colorLog('green', `[Watcher] Child exit success! Watcher exit. \t ${new Date()}`);
+      _colorLog('cyan', `[Watcher] Child exit success! Watcher exit. \t ${new Date()}`);
       execSync('rm -rf -- ' + PORT);
       // execSync('rm -rf  ' + ERROR_LOG_PATH); //清空 error log.
       // execSync('rm -rf  ' + ERROR_LOG_PATH + '.bak'); //清空 error log 备份.
