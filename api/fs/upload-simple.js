@@ -18,7 +18,7 @@ router.put('*',  function(req, res, next) {
     next(err);
   })
   stream.on('finish', function(){
-    res.end('ok');
+    res.type('text').end('ok');
   })
 });
  

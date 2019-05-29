@@ -37,7 +37,7 @@ router.post('/restore', function(req, res, next){
       if(err){
         return next(err);
       }
-      res.end('ok');
+      res.type('text').end('ok');
     });
   });
 
@@ -52,7 +52,7 @@ router.delete('/:id', function(req, res, next) {
     if(err) {
       return next(err);
     }
-    res.end('ok');
+    res.type('text').end('ok');
   });
 });
 
@@ -62,7 +62,7 @@ router.delete('/', function(req, res, next) {
       return next(err);
     }
 
-    res.end('ok');
+    res.type('text').end('ok');
 
   }, global.RECYCLE_BIN_PATH);
 });

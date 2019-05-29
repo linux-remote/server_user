@@ -99,7 +99,7 @@ function rename(req, res, next){
     if(err) {
       return next(err);
     }
-    res.end('ok');
+    res.type('text').end('ok');
   })
 }
 

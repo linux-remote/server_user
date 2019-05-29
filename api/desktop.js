@@ -22,11 +22,11 @@ router.get('/icons', function(req, res, next){
 });
 
 router.post('/icons', function(req, res, next){
-  fs.writeFile(ICON_CONF_PATH, req.body.data, function(err){
+  fs.writeFile(ICON_CONF_PATH, req.body.content, function(err){
     if(err){
       return next(err);
     }
-    res.end('ok');
+    res.type('text').end('ok');
   })
 });
 

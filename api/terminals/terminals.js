@@ -17,7 +17,7 @@ module.exports = function(app) {
 
     term.resize(cols, rows);
     // console.log('Resized terminal ' + pid + ' to ' + cols + ' cols and ' + rows + ' rows.');
-    res.end();
+    res.type('text').end('ok');
   });
   
   // 创建
@@ -39,7 +39,7 @@ module.exports = function(app) {
     term.on('data', function(data) {
       logs[term.pid] += data;
     });
-    res.end(term.pid.toString());
+    res.type('text').end(term.pid.toString());
   });
 
 
