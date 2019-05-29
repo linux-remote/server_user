@@ -22,7 +22,7 @@ var upload = multer({storage}).single('file');
 router.put('*',  function(req, res, next) {
   
   req.PATH = decodeURIComponent(req.path);
-
+  // 会在中断后二分钟后触发.
   // req.on('aborted', () => {
   //   fs.unlink(req._destination_path);
   // })
