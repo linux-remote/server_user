@@ -3,13 +3,18 @@ const path = require('path');
 const { FLAG, ERROR_FLAG } = require('./lib/util');
 
 const PORT = process.env.PORT;
+
 console.log('PORT', PORT);
-if(PORT.indexOf('/linux-remote') !== -1) {
-  execSync('rm -rf -- ' + PORT); //删除旧的 sock 文件, 才能启动.
-} else {
-  console.error(ERROR_FLAG);
-  throw new Error('port is not reasonable');
+const isUnixSockPort = !Number(PORT);
+if(isUnixSockPort) {
+  if(PORT.indexOf('/linux-remote') !== -1) {
+    execSync('rm -rf -- ' + PORT); //删除旧的 sock 文件, 才能启动.
+  } else {
+    console.error(ERROR_FLAG);
+    throw new Error('port is not reasonable');
+  }
 }
+
 
 const NODE_ENV = process.env.NODE_ENV;
 const IS_PRO = NODE_ENV === 'production';
@@ -35,7 +40,7 @@ const serverInfo = require('./api/server-info');
 const recycleBin = require('./api/recycle-bin');
 const fsApi = require('./api/fs');
 const disk = require('./api/disk');
-const upload = require('./api/fs/upload');
+const upload = require('./api/fs/upload-simple');
 const terminals = require('./api/terminals/terminals');
 const desktop = require('./api/desktop');
 const time = require('./api/time');
@@ -50,9 +55,11 @@ execSync('mkdir -m=755 -p -- ' + global.RECYCLE_BIN_PATH);
 var app = express();
 app.disable('x-powered-by');
 
+if(!isUnixSockPort){
+  app.use(middleWare.CORS);
+}
 
-
-if(!IS_PRO) {
+if(!IS_PRO) {  
   app.use(logger('dev'));
 }
 
@@ -64,37 +71,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-//================= 用户进程 TTL =================
-// var _ttpMin = 15;
-// if(!global.IS_PRO){
-//   _ttpMin = 1000;
-// }
-// const TTL_MAX_AGE = 1000 * 60 * _ttpMin;
 
-// var now = Date.now();
-
-// console.log('[Process TTL] start at: ' + 
-//             timeFormat() + 
-//             '  maxAge: ' + 
-//             ((TTL_MAX_AGE / 1000) / 60)  + 
-//             ' minute.');
-
-// const TTL = function(){
-//   setTimeout(() =>{
-//     if(Date.now() - now >= TTL_MAX_AGE){
-//       console.log('[Process TTL] process.exit by TTL end.' + timeFormat());
-//       normalExit();
-//     }else{
-//       TTL();
-//     }
-//   }, TTL_MAX_AGE);
-// }
-
-// app.use(function(req, res, next){
-//   now = Date.now();
-//   next();
-// });
-//================= 用户进程 TTL end =================
 
 
 app.get('/', function(req, res){
@@ -135,7 +112,9 @@ var server = http.createServer(app);
 server.listen(PORT);
 
 server.on('listening', onListening(server, function(){
-  execSync('chmod 600 -- ' + PORT);
+  if(isUnixSockPort){
+    execSync('chmod 600 -- ' + PORT);
+  }
   console.log(FLAG);
 }));
 
@@ -143,9 +122,6 @@ server.on('error', function(port) {
   console.log(ERROR_FLAG);
   onError(port);
 });
-
-
-
 
 function normalExit(){
   process.exit();
