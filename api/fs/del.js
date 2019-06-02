@@ -36,7 +36,7 @@ function mvToRecycleBin(req, res, next){
     if(err) {
       return next(err);
     }
-    res.type('text').end('ok');
+    res.end('ok');
   })
 }
 
@@ -50,7 +50,7 @@ function rm_rf(req, res, next){
     if(err){
       return next(err);
     }
-    res.type('text').end('ok');
+    res.end('ok');
   }, req.PATH)
 }
 

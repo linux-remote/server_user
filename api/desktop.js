@@ -26,7 +26,7 @@ router.post('/icons', function(req, res, next){
     if(err){
       return next(err);
     }
-    res.type('text').end('ok');
+    res.end('ok');
   })
 });
 

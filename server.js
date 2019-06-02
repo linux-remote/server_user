@@ -59,9 +59,13 @@ if(!isUnixSockPort){
   app.use(middleWare.CORS);
 }
 
-if(!IS_PRO) {  
+if(!IS_PRO) {
   app.use(logger('dev'));
 }
+
+app.get('/alive', function(req, res){
+  res.end('Y');
+})
 
 terminals(app);
 
@@ -79,9 +83,7 @@ app.get('/', function(req, res){
   res.send(msg);
 });
 
-app.get('/live', function(req, res){
-  res.send('Y');
-});
+// app.get('/live', ttl);
 
 app.use('/time', middleWare.preventUnxhr, time);
 app.use('/desktop', middleWare.preventUnxhr, desktop);
