@@ -7,7 +7,7 @@ const path = require('path');
 // w cover  = true
 router.put('*',  function(req, res, next) {
   req.on('aborted', () => { 
-    // console.log('user server aborted');
+    //  _console.log('user server aborted');
     stream.destroy();
   });
   req.PATH = decodeURIComponent(req.path);

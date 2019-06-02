@@ -25,7 +25,7 @@ DebounceTime.prototype.process = function(){
     return;
   }
   this.timer = setInterval(() => {
-    // console.error('setInterval');
+    //  _console.error('setInterval');
     this.isInputing = false;
     if(this.inputedCount === this.inputCount){
       this.inputedCount = this.inputCount = 0;

@@ -4,14 +4,13 @@ const { FLAG, ERROR_FLAG } = require('./lib/util');
 
 const PORT = process.env.PORT;
 
-console.log('PORT', PORT);
 const isUnixSockPort = !Number(PORT);
 if(isUnixSockPort) {
   if(PORT.indexOf('/linux-remote') !== -1) {
     execSync('rm -rf -- ' + PORT); //删除旧的 sock 文件, 才能启动.
   } else {
-    console.error(ERROR_FLAG);
-    throw new Error('port is not reasonable');
+    console.info(ERROR_FLAG);
+    throw new Error('Port is not reasonable');
   }
 }
 
@@ -97,13 +96,7 @@ app.get('/disk',middleWare.preventUnxhr, disk);
 app.use('/serverInfo', middleWare.preventUnxhr, serverInfo);
 app.use('/recycleBin', middleWare.preventUnxhr, recycleBin);
 app.use('/ps', middleWare.preventUnxhr, ps);
-app.delete('/exit', function(req, res){
-  res.send('exit');
-  res.on('finish', function(){
-    console.log('User server exit!');
-    normalExit();
-  });
-});
+
 
 // catch 404 and forward to error handler
 app.use(middleWare.notFound);
@@ -117,17 +110,12 @@ server.on('listening', onListening(server, function(){
   if(isUnixSockPort){
     execSync('chmod 600 -- ' + PORT);
   }
-  console.log(FLAG);
+  console.info(FLAG);
 }));
 
 server.on('error', function(port) {
-  console.log(ERROR_FLAG);
+  console.info(ERROR_FLAG);
   onError(port);
 });
-
-function normalExit(){
-  process.exit();
-}
-
 
 createWsSerever(server);

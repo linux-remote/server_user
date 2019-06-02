@@ -36,7 +36,7 @@ function fsSys(req, res, next){
       ls(req, res, next);
       return;
     }else{
-      //console.log('req.path', req.PATH, path.basename(req.PATH))
+      //  _console.log('req.path', req.PATH, path.basename(req.PATH))
       if(req.query.download){
         res.set({
           'Content-Disposition': 'attachment; filename="' + path.basename(req.PATH) + '"'

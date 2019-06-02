@@ -52,8 +52,8 @@ function parse(stdout){
   })
 }
 // const result = parse(testStr)
-// //console.log(parse(testStr));
-// console.log(result);
+// //  _console.log(parse(testStr));
+//  _console.log(result);
 module.exports = function(req, res, next){
   execComplete(CMD, function(err, result){
     if(err){

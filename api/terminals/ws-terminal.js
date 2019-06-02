@@ -8,15 +8,15 @@ const wsServer = new WebSocket.Server({ noServer: true });
 wsServer.on('connection', function connection(ws, req) {
   const parsed = url.parse(req.url, true);
   const pid = parsed.query.pid;
-  // console.log('pid', parsed.query.pid);
+  //  _console.log('pid', parsed.query.pid);
   // ws.on('message', function incoming(message) {
-  //   console.log('received: %s', message);
+  //  _console.log('received: %s', message);
   // });
 
 
   var term = terminals[pid];
-  console.log('Connected to terminal ' + term.pid);
-  // console.log('logs[term.pid] ' + logs[term.pid]);
+  // _console.log('Connected to terminal ' + term.pid);
+  //  _console.log('logs[term.pid] ' + logs[term.pid]);
   ws.send(logs[term.pid]);
 
   function buffer(socket, timeout) {
@@ -51,7 +51,7 @@ wsServer.on('connection', function connection(ws, req) {
 
   ws.on('close', function () {
     term.kill();
-    console.log('Closed terminal ' + term.pid);
+    // _console.log('Closed terminal ' + term.pid);
     // Clean things up
   });
 

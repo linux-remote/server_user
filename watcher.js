@@ -1,4 +1,4 @@
-// console style like nodemon.
+//  _console style like nodemon.
 
 const {spawn, execSync} = require('child_process');
 const watch = require('watch');
@@ -18,7 +18,7 @@ var _COLOR_MAP = {red: 31,
   yellow: 33, 
   cyan: 96};
 function _colorLog(style, str) {
-  console.log('\u001b[' + _COLOR_MAP[style] + 'm' + str + '\u001b[39m');
+  console.info('\u001b[' + _COLOR_MAP[style] + 'm' + str + '\u001b[39m');
 }
 
 var child, fileIsChange = false;
@@ -30,7 +30,7 @@ function _watch(dir){
     ignoreDirectoryPattern: /node_modules/
   }, function(f){
     if(typeof f !== 'object'){
-      console.log('[watcher]file changed');
+      console.info('[watcher]file changed');
       if(f === process.mainModule.filename){
         return; // 此文件
       }

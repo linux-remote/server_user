@@ -8,7 +8,7 @@ const wsServer = new WebSocket.Server({ noServer: true });
 
 
 wsServer.on('connection', function connection(ws) {
-  console.log('ws-ps connection2');
+  // _console.log('ws-ps connection2');
   const l = spawn('top', ['-b']);
   let out = '';
   const debounce = new DebounceTime(function(){
@@ -26,16 +26,16 @@ wsServer.on('connection', function connection(ws) {
   }, 500);
 
   l.stdout.on('data', function(buffer) {
-    // console.log('buffer', buffer);
+    // _console.log('buffer', buffer);
     out += buffer;
     debounce.trigger();
   }) 
   l.on('exit', function(){
-    // console.log('l exit');
+    // _console.log('l exit');
     ws.terminate();
   });
   ws.on('close', function(){
-    // console.log('ws close');
+    // _console.log('ws close');
     l.kill();
   })
 });

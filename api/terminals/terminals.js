@@ -16,7 +16,7 @@ module.exports = function(app) {
       term = terminals[pid];
 
     term.resize(cols, rows);
-    // console.log('Resized terminal ' + pid + ' to ' + cols + ' cols and ' + rows + ' rows.');
+    //  _console.log('Resized terminal ' + pid + ' to ' + cols + ' cols and ' + rows + ' rows.');
     res.end('ok');
   });
   
@@ -33,7 +33,7 @@ module.exports = function(app) {
         env: process.env
       });
 
-    // console.log('Created terminal with PID: ' + term.pid);
+    //  _console.log('Created terminal with PID: ' + term.pid);
     terminals[term.pid] = term;
     logs[term.pid] = '';
     term.on('data', function(data) {
@@ -48,8 +48,8 @@ module.exports = function(app) {
   app.ws('/terminals/:pid', function (ws, req) {
 
     var term = terminals[parseInt(req.params.pid)];
-    console.log('Connected to terminal ' + term.pid);
-    // console.log('logs[term.pid] ' + logs[term.pid]);
+    // _console.log('Connected to terminal ' + term.pid);
+    //  _console.log('logs[term.pid] ' + logs[term.pid]);
     ws.send(logs[term.pid]);
 
     function buffer(socket, timeout) {
@@ -80,7 +80,7 @@ module.exports = function(app) {
     });
     ws.on('close', function () {
       term.kill();
-      console.log('Closed terminal ' + term.pid);
+      // _console.log('Closed terminal ' + term.pid);
       // Clean things up
       delete terminals[term.pid];
       delete logs[term.pid];
