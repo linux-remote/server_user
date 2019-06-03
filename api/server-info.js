@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
 const os = require('os');
-const {execComplete} = require('./child-exec');
+const fs = require('fs');
 router.get('/', function(req, res, next){
-  execComplete('cat /etc/issue', (err, result) => {
+  fs.readFile('/etc/issue', 'utf-8', (err, result) => {
     if(err) return next(err);
     res.json({
       platform: os.platform(),
