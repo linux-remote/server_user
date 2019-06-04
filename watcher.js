@@ -109,7 +109,7 @@ if(IS_PRO){
 
 function loop(){
   child = spawn(process.argv[0], ['server.js'], {
-    detached: true,
+    detached: false, // Fixed: https://github.com/linux-remote/linux-remote/issues/167
     cwd: __dirname,
     stdio: 'inherit'
   });
@@ -132,3 +132,4 @@ function loop(){
 loop();
 
 
+// _console.log('user watcher pid:', process.pid);

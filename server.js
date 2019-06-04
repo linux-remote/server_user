@@ -110,6 +110,7 @@ server.on('listening', onListening(server, function(){
   if(isUnixSockPort){
     execSync('chmod 600 -- ' + PORT);
   }
+  // _console.log('user server pid:', process.pid);
   console.info(FLAG);
 }));
 
