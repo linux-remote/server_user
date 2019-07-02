@@ -9,6 +9,7 @@ if(isUnixSockPort) {
   if(PORT.indexOf('/linux-remote') !== -1) {
     execSync('rm -rf -- ' + PORT); //删除旧的 sock 文件, 才能启动.
   } else {
+    console.error('PORT path error');
     console.info(ERROR_FLAG);
     throw new Error('Port is not reasonable');
   }
@@ -29,7 +30,6 @@ const http = require('http');
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const eStatic = require('express').static;
 
 const { onListening, onError } = require('./lib/util');
 const createWsSerever = require('./ws-server');
@@ -91,7 +91,6 @@ app.use('/desktop', middleWare.preventUnxhr, desktop);
 
 app.use('/fs', fsApi); // preventUnxhr inner.
 
-app.use('/fs', eStatic('/', {dotfiles: 'allow', maxAge: 0}));
 app.get('/disk',middleWare.preventUnxhr, disk);
 app.use('/serverInfo', middleWare.preventUnxhr, serverInfo);
 app.use('/recycleBin', middleWare.preventUnxhr, recycleBin);
@@ -115,8 +114,8 @@ server.on('listening', onListening(server, function(){
 }));
 
 server.on('error', function(port) {
-  console.info(ERROR_FLAG);
   onError(port);
+  console.info(ERROR_FLAG);
 });
 
 createWsSerever(server);

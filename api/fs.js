@@ -36,13 +36,18 @@ function fsSys(req, res, next){
       ls(req, res, next);
       return;
     }else{
-      //  _console.log('req.path', req.PATH, path.basename(req.PATH))
-      if(req.query.download){
-        res.set({
-          'Content-Disposition': 'attachment; filename="' + path.basename(req.PATH) + '"'
-        })
-      }
-      next();
+      fs.access(req.PATH, fs.constants.R_OK, (err) => { // Fixed: issues/185
+        if(err){
+          return next(err);
+        }
+        if(req.query.download){
+          res.download(req.PATH, path.basename(req.PATH));
+        } else {
+          res.sendFile(req.PATH, {
+            dotfiles: 'allow'
+          });
+        }
+      });
       return;
     }
   }
