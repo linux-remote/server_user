@@ -54,7 +54,7 @@ router.post('/icons', function(req, res, next){
 router.get('/bundle', function(req, res, next){
   sas({
     $recycebinFiles: cb => fs.readdir(global.RECYCLE_BIN_PATH, cb),
-    $groups : cb => execComplete('groups', cb),
+    $id : cb => execComplete('id', cb),
     $icons: cb => fsGetOrInit(ICON_CONF_PATH, ICON_INIT_DATA, cb),
     // $quickBar: cb => fsGetOrInit(QUICK_BAR_CONFIG_PATH, QUICK_BAR_INIT_DATA, cb)
   }, function(err, result){
@@ -63,7 +63,7 @@ router.get('/bundle', function(req, res, next){
     }
     result.recycebinIsEmpty = result.recycebinFiles.length === 0;
     delete(result.recycebinFiles);
-    result.groups = result.groups.substr(0, result.groups.length - 1).split(/\s/); //substr 去除最后的 \n 
+    //result.groups = result.groups.substr(0, result.groups.length - 1).split(/\s/); //substr 去除最后的 \n 
 
     res.json({
       ...result,
