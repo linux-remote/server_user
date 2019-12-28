@@ -4,8 +4,8 @@ const { FLAG, ERROR_FLAG } = require('./lib/util');
 
 const PORT = process.env.PORT;
 
-const isUnixSockPort = !Number(PORT);
-if(isUnixSockPort) {
+const isUnixSocket = !Number(PORT);
+if(isUnixSocket) {
   if(PORT.indexOf('/linux-remote') !== -1) {
     execSync('rm -rf -- ' + PORT); //删除旧的 sock 文件, 才能启动.
   } else {
@@ -54,7 +54,7 @@ execSync('mkdir -m=755 -p -- ' + global.RECYCLE_BIN_PATH);
 var app = express();
 app.disable('x-powered-by');
 
-if(!isUnixSockPort){
+if(!isUnixSocket){
   app.use(middleWare.CORS);
 }
 
@@ -106,8 +106,9 @@ var server = http.createServer(app);
 server.listen(PORT);
 
 server.on('listening', onListening(server, function(){
-  if(isUnixSockPort){
+  if(isUnixSocket){
     execSync('chmod 600 -- ' + PORT);
+    execSync('setfacl -m u:linux-remote:rw -- ' + PORT);
   }
   // _console.log('user server pid:', process.pid);
   console.info(FLAG);
