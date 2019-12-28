@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git@github.com:linux-remote/linux-remote-user-server.git"
   },
+  "files": ["api", "common", "lib", "index.js", "server.js", "ws-server.js"],
   "scripts": {
     "start": "NODE_ENV=development PORT=3001 nodemon --ignore test/ -e js -L server.js",
     "_devInstall": "cnpm i --by=npm --no-bin-links",
