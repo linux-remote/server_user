@@ -24,19 +24,18 @@ function ls(req, res, next){
 function genCmd(opts) {
 
   let d = '', a = ` -a --ignore='..'`;
-  let self = '';
+  let file = '';
   
 
   if(opts.self) {
     d = ' -d';
-    self = opts._isSelfWrap ? opts.self : wrapPath(opts.self);
-    self = ' -- ' + self;
+    file = opts._isSelfWrap ? opts.self : wrapPath(opts.self);
   }
 
   if(opts.noDir){ //去掉 . 和 ..
     a = ' -A';
   }
-  const cmd = `ls -U -l --color=none -Q --time-style='+%Y-%m-%d %H:%M:%S'${a}${d}${self}`;
+  const cmd = `ls -U -l --color=none -Q --time-style='+%Y-%m-%d %H:%M:%S'${a}${d} -- ${file}`;
   return cmd;
 }
 

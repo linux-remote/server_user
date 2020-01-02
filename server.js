@@ -108,6 +108,8 @@ server.listen(PORT);
 server.on('listening', onListening(server, function(){
   if(isUnixSocket){
     execSync('chmod 600 -- ' + PORT);
+    // setfacl auto show group with 'll'. 'rwx------' ===> 'rwxrw----+'
+    //  g:linux-remote:rw
     execSync('setfacl -m u:linux-remote:rw -- ' + PORT);
   }
   // _console.log('user server pid:', process.pid);
