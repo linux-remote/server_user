@@ -106,7 +106,25 @@ exports.preventUnxhr = function(req, res ){
   }
 }
 
-// $$common$$
-exports.FLAG = '*********** LINUX-REMOTE-USER-SERVER-START ***********';
-// $$common$$
-exports.ERROR_FLAG = '*********** LINUX-REMOTE-USER-SERVER-ERROR ***********';
+// $$common$$ 
+// server user-server 各有一份相同的。
+// 2020/04/01
+function genUserServerFlag(){
+  let wrap = '***';
+  let serverName = 'LR-USER-SERVER';
+  let START_FLAG = `${wrap}${serverName}-START${wrap}`;
+  let ERR_FLAG_START = `${wrap}${serverName}-ERR-START${wrap}`;
+  let ERR_FLAG_END = `${wrap}${serverName}-ERR-END${wrap}`;
+  return {
+    START_FLAG,
+    ERR_FLAG_START,
+    ERR_FLAG_END
+  }
+}
+
+exports.genUserServerFlag = genUserServerFlag;
+
+// // $$common$$
+// '*********** LINUX-REMOTE-USER-SERVER-START ***********';
+// // $$common$$
+// exports.ERROR_FLAG_START = '*********** LINUX-REMOTE-USER-SERVER-ERROR-START ***********';
