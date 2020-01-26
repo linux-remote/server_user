@@ -10,24 +10,18 @@
     "type": "git",
     "url": "git@github.com:linux-remote/linux-remote-user-server.git"
   },
-  "files": ["src", "index.js"],
+  "files": [
+    "src",
+    "index.js"
+  ],
   "scripts": {
     "start": "NODE_ENV=development PORT=3001 nodemon --ignore test/ -e js -L server.js",
     "_devInstall": "cnpm i --by=npm --no-bin-links",
     "linuxIpty": "npm install node-pty --save --no-bin-links"
   },
   "dependencies": {
-    "node-pty": "^0.8.1",
-    "sas": "^3.0.4",
-    "body-parser": "^1.18.3",
-    "express": "^4.16.3",
-    "morgan": "~1.9.1",
-    "serve-favicon": "^2.5.0",
-    "ws": "^6.0.0"
+    "node-pty": "^0.9.0",
+    "sas": "^3.0.4"
   },
-  "devDependencies": {
-    "watch": "^1.0.2",
-    "babel-eslint": "^7.2.3",
-    "eslint": "^5.15.3"
-  }
+  "devDependencies": {}
 }
