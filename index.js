@@ -1,2 +1,2 @@
-const path = require('path');
-module.exports = path.join(__dirname, './src/server.js');
+
+require('./src/net-server.js');

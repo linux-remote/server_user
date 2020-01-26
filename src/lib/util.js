@@ -1,4 +1,3 @@
-const uid = require('uid-safe');
 const fs = require('fs');
 const path = require('path');
 

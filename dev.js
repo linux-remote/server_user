@@ -52,7 +52,7 @@ function handleChildCrash(){
 }
 
 function loop(){
-  child = spawn(process.argv[0], ['./src/net-server.js'], {
+  child = spawn(process.argv[0], ['index.js'], {
     cwd: __dirname,
     stdio: 'inherit'
   });
