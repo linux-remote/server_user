@@ -108,7 +108,7 @@ exports.preventUnxhr = function(req, res ){
 
 // $$common$$ 
 // server user-server 各有一份相同的。
-// 2020/04/01
+// 2020/01/04
 function genUserServerFlag(){
   let wrap = '***';
   let serverName = 'LR-USER-SERVER';

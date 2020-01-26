@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const net = require('net');
 
-const { FLAG, ERR_FLAG_START, ERR_FLAG_END, genUserServerFlag } = require('./lib/util');
+const { genUserServerFlag } = require('./lib/util');
 
 let flags = genUserServerFlag();
 
