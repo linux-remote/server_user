@@ -20,6 +20,7 @@
     "linuxIpty": "npm install node-pty --save --no-bin-links"
   },
   "dependencies": {
+    "base64-2-safe": "^1.0.2",
     "node-pty": "^0.9.0",
     "sas": "^3.0.4"
   },

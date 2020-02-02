@@ -66,7 +66,7 @@ router.get('/bundle', function(req, res, next){
     //result.groups = result.groups.substr(0, result.groups.length - 1).split(/\s/); //substr 去除最后的 \n 
 
     res.json({
-      ...result,
+      ...result, 
       hostname: os.hostname(),
       homedir: os.homedir(),
       // mask: process.umask()
