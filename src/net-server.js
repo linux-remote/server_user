@@ -29,7 +29,7 @@ function hashSid(sid){
 userInfo.sidHash = process.env.LR_SID_HASH;
 global.CONF = userInfo;
 
-const PORT = os.tmpdir() + '/linux-remote/' + userInfo.sidHash + '.' + userInfo.username;
+const PORT = global.__TMP_DIR__ + '/linux-remote/' + userInfo.sidHash + '.' + userInfo.username;
 
 let sidCache;
 function verifySid(sid){
