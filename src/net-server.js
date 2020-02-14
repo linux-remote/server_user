@@ -48,30 +48,28 @@ function verifySid(sid){
 }
 const server = net.createServer(function(socket){
   socket.setEncoding('utf-8');
+  socket.setNoDelay(true);
   socket.once('data', function(sid){
     
   console.log('once data', sid);
     if(!verifySid(sid)){
       socket.end('not verify');
     } else {
-      socket.write('ok');
-
-      socket.on('data', function(data){
-        console.log('on data', data);
-        let jsonData;
-        try {
-          jsonData = JSON.parse(data);
-        } catch(e){
-          jsonData = {
-            method: data
+      socket.write('ok', function(){
+        socket.on('data', function(data){
+          console.log('on data', data);
+          let jsonData;
+          try {
+            jsonData = JSON.parse(data);
+          } catch(e){
+            jsonData = {
+              method: data
+            }
+            // return socket.end(e.name + ': ' + e.message);
           }
-          // return socket.end(e.name + ': ' + e.message);
-        }
-    
-        handleJsonData(socket, jsonData);
-        
+          handleJsonData(socket, jsonData);
+        });
       });
-
     }
   });
 
