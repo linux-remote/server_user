@@ -1,10 +1,9 @@
-const {execSync} = require('child_process');
+const { execSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const net = require('net');
 const crypto = require('crypto');
 const base64ToSafe = require('base64-2-safe');
-
 const handleJsonData = require('./handle-json-data.js');
 
 const { genUserServerFlag } = require('./lib/util');
@@ -16,16 +15,7 @@ function hashSid(sid){
   let hash = crypto.createHash('sha256').update(sid).digest('base64');
   return base64ToSafe(hash);
 }
-// const userTmpDir = os.tmpdir() + '/linux-remote/' + process.env.LR_SID_HASH + '.' + userInfo.username;
 
-// try {
-//   fs.mkdirSync(userTmpDir);
-// } catch(e){
-//   if(e.code !== 'EEXIST'){
-//     throw e;
-//   }
-// }
-// userInfo.userTmpDir = userTmpDir;
 userInfo.sidHash = process.env.LR_SID_HASH;
 global.CONF = userInfo;
 
@@ -51,24 +41,29 @@ const server = net.createServer(function(socket){
   socket.setNoDelay(true);
   socket.once('data', function(sid){
     
-  console.log('once data', sid);
+    // console.log('once data', sid);
     if(!verifySid(sid)){
       socket.end('not verify');
     } else {
       socket.write('ok', function(){
-        socket.on('data', function(data){
-          console.log('on data', data);
-          let jsonData;
-          try {
-            jsonData = JSON.parse(data);
-          } catch(e){
-            jsonData = {
-              method: data
-            }
-            // return socket.end(e.name + ': ' + e.message);
-          }
-          handleJsonData(socket, jsonData);
-        });
+        // const sr = new SocketRequest(socket);
+        // sr.onRequest = function(data, reply){
+          
+        // }
+        handleJsonData(socket);
+        // socket.on('data', function(data){
+        //   // console.log('on data', data);
+        //   let jsonData;
+        //   try {
+        //     jsonData = JSON.parse(data);
+        //   } catch(e){
+        //     jsonData = {
+        //       method: data
+        //     }
+        //     // return socket.end(e.name + ': ' + e.message);
+        //   }
+        //   handleJsonData(socket, jsonData);
+        // });
       });
     }
   });
@@ -112,6 +107,7 @@ process.on('exit', function(){
   try {
     fs.unlinkSync(PORT);
   } catch(e){
-
+    console.error('Unlink PORT Error');
+    console.error(e);
   }
 });
