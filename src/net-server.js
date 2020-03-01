@@ -1,25 +1,43 @@
-const { execSync } = require('child_process');
 const fs = require('fs');
-const os = require('os');
+const path = require('path');
 const net = require('net');
 const crypto = require('crypto');
+const { execSync } = require('child_process');
+
 const base64ToSafe = require('base64-2-safe');
-const handleJsonData = require('./handle-json-data.js');
 
+const handleJsonData = require('./handle-json-data/index.js');
 const { genUserServerFlag } = require('./lib/util');
-
-const userInfo = os.userInfo();
 let flags = genUserServerFlag();
+const CONF = global.CONF;
+const userInfo = global.__USER_INFO__;
 
-function hashSid(sid){
-  let hash = crypto.createHash('sha256').update(sid).digest('base64');
-  return base64ToSafe(hash);
+if(!userInfo.homedir){
+  _errOut('Error: not have homedir');
+  return;
+}
+if(userInfo.homedir === '/'){
+  _errOut('Error: homedir cannot be ' + userInfo.homedir);
+  return;
 }
 
-userInfo.sidHash = process.env.LR_SID_HASH;
-global.CONF = userInfo;
+try {
+  fs.statSync(CONF.hiddenRootDir);
+} catch(err){
+  if(err.code === 'ENOENT'){
+    try {
+      fs.mkdirSync(CONF.hiddenRootDir);
+    } catch(err) {
+      _errOut(err.name + ": " + err.message);
+      return;
+    }
+  } else {
+    _errOut(err.name + ": " + err.message);
+    return;
+  }
+}
 
-const PORT = global.__TMP_DIR__ + '/linux-remote/' + userInfo.sidHash + '.' + userInfo.username;
+const PORT = global.__TMP_DIR__ + '/linux-remote/' + CONF.sidHash + '.' + userInfo.username;
 
 let sidCache;
 function verifySid(sid){
@@ -29,41 +47,23 @@ function verifySid(sid){
   if(sidCache){
     return sidCache === sid;
   }
-  const hash = hashSid(sid);
-  if(hash === userInfo.sidHash){
+  const hash = _hashSid(sid);
+  if(hash === CONF.sidHash){
     sidCache = sid;
     return true;
   }
   return false;
 }
+
 const server = net.createServer(function(socket){
   socket.setEncoding('utf-8');
   socket.setNoDelay(true);
   socket.once('data', function(sid){
-    
-    // console.log('once data', sid);
     if(!verifySid(sid)){
       socket.end('not verify');
     } else {
       socket.write('ok', function(){
-        // const sr = new SocketRequest(socket);
-        // sr.onRequest = function(data, reply){
-          
-        // }
         handleJsonData(socket);
-        // socket.on('data', function(data){
-        //   // console.log('on data', data);
-        //   let jsonData;
-        //   try {
-        //     jsonData = JSON.parse(data);
-        //   } catch(e){
-        //     jsonData = {
-        //       method: data
-        //     }
-        //     // return socket.end(e.name + ': ' + e.message);
-        //   }
-        //   handleJsonData(socket, jsonData);
-        // });
       });
     }
   });
@@ -90,24 +90,32 @@ server.on('error', (err) => {
     return;
   }
   if(flags){
-    console.error(flags.ERR_FLAG_START + e.message + flags.ERR_FLAG_END);
-    process.exit(1);
+    _errOut(err.name + ": " + err.message);
   } else {
-    throw e;
+    throw err;
   }
 });
 
 ['SIGINT', 'SIGTERM', 'SIGHUP'].forEach(k => {
   process.on(k, () => {
     process.exit(1);
-  })
+  });
 });
 
 process.on('exit', function(){
   try {
     fs.unlinkSync(PORT);
   } catch(e){
-    console.error('Unlink PORT Error');
+    console.error('Userserver unlink PORT error');
     console.error(e);
   }
 });
+
+function _errOut(message){
+  console.error(flags.ERR_FLAG_START + message + flags.ERR_FLAG_END);
+}
+
+function _hashSid(sid){
+  let hash = crypto.createHash('sha256').update(sid).digest('base64');
+  return base64ToSafe(hash);
+}

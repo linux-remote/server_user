@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+// const crypto = require('crypto');
+const sortTimeStartPoint = 1579660004551; // 2020/01/22
 
 // exports.timeFormat = function(date, fmt){
 //   date = date ? new Date(date) : new Date();
@@ -68,40 +70,18 @@ exports.onListening = function(server, callback) {
 
 exports.ensureUniqueId = function(filePath){
   return function generateId(callback) {
-    var id = uid.sync(24);
+    var id = Date.now() - sortTimeStartPoint;
     fs.lstat(path.join(filePath, id), function(err){
       if(err){
         if(err.code === 'ENOENT'){
           callback(null, id);
         } else {
-          callback(err)
+          callback(err);
         }
       } else {
         generateId(callback);
       }
     });
-  }
-}
-// exports.ensureUniqueIdSync = function(filePath){
-//   return function generateId() {
-//     var id = uid.sync(24);
-//     try{ 
-//       fs.statSync(path.join(filePath, id))
-//     } catch(e) {
-//       if(e.code === 'ENOENT'){
-//         return id;
-//       }
-//       throw e;
-//     }
-//     return generateId()
-//   }
-// }
-exports.preventUnxhr = function(req, res ){
-  if(!req.xhr) {
-    res.status(400).end("xhr only");
-    return true;
-  } else {
-    return false;
   }
 }
 
@@ -122,8 +102,3 @@ function genUserServerFlag(){
 }
 
 exports.genUserServerFlag = genUserServerFlag;
-
-// // $$common$$
-// '*********** LINUX-REMOTE-USER-SERVER-START ***********';
-// // $$common$$
-// exports.ERROR_FLAG_START = '*********** LINUX-REMOTE-USER-SERVER-ERROR-START ***********';

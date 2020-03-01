@@ -4,7 +4,6 @@ const fs = require('fs');
 
 const path = require('path');
 
-const { preventUnxhr } = require('../lib/util');
 const { cutAndCopy } = require('./fs/moveAndCopy');
 const ls = require('./fs/ls');
 const createSymbolicLink = require('./fs/sym-link');
@@ -25,14 +24,8 @@ function fsSys(req, res, next){
   req.PATH = decodeURIComponent(req.path);
   if(method === 'GET'){
 
-    // if(preventUnxhr(req, res)){
-    //   return;
-    // }
 
     if(req.query.dir){
-      if(preventUnxhr(req, res)){
-        return;
-      }
       ls(req, res, next);
       return;
     }else{
@@ -51,14 +44,6 @@ function fsSys(req, res, next){
       return;
     }
   }
-
-  if(preventUnxhr(req, res)){
-    return;
-  }
-
-  // if(method === 'DELETE'){
-  //   return moveToDustbin(req, res, next);
-  // }
 
   if(method === 'PUT'){
     return updateFile(req, res, next);
