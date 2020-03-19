@@ -1,18 +1,23 @@
 
 const os = require('os');
+const termMap = require('./terminal/store.js');
 const SocketRequest = require('../../../socket-request/index.js');
 
 const quickLaunch = require('./quick-launch.js');
 const desktop = require('./desktop.js');
-
+const fsMethods = require('./fs/index.js');
+const termMethods = require('./terminal/term.js');
 const methodsMap = Object.create(null);
 Object.assign(methodsMap, quickLaunch);
 Object.assign(methodsMap, desktop);
+Object.assign(methodsMap, fsMethods);
+Object.assign(methodsMap, termMethods);
 
 function handleJsonData(socket){
   const sr = new SocketRequest(socket);
+  global.__SOCKET_REQUEST__ = sr;
   sr.onRequest = function(data, reply){
-    console.log('onRequest', data)
+    console.log('onRequest', data);
     const method = data.method;
     if(method === 'getDesktopBundle'){
       
@@ -22,7 +27,8 @@ function handleJsonData(socket){
         status: 200,
         data: {
           ...userInfo,
-          hostname: os.hostname()
+          hostname: os.hostname(),
+          createdTerm: Object.keys(termMap)
         }
       });
     } else if(method === 'getTime') {
@@ -33,6 +39,14 @@ function handleJsonData(socket){
           timeZoneOffset: d.getTimezoneOffset(),
           time: d.getTime()
         }
+      });
+    } else if(method === 'logout') {
+      reply({
+        status: 200,
+        data: 'ok'
+      });
+      socket.end(function(){
+        process.exit();
       });
     } else if(methodsMap[method]) {
 

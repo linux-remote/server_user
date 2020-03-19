@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 const net = require('net');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
@@ -27,6 +26,7 @@ try {
   if(err.code === 'ENOENT'){
     try {
       fs.mkdirSync(CONF.hiddenRootDir);
+      fs.mkdirSync(global.RECYCLE_BIN_PATH);
     } catch(err) {
       _errOut(err.name + ": " + err.message);
       return;
