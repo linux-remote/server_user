@@ -24,8 +24,7 @@ function termCreate(data, callback){
   const fl = new LimitFrequency(function() {
     global.__SOCKET_REQUEST__.request([2, id, tmp]);
     tmp = '';
-
-  }, 40);
+  }, 30);
 
 
   term.on('data', (data) => {
