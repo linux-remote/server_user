@@ -6,6 +6,7 @@ const { execSync } = require('child_process');
 const base64ToSafe = require('base64-2-safe');
 
 const handleJsonData = require('./handle-json-data/index.js');
+const handleNormal = require('./handle-normal.js');
 const { genUserServerFlag } = require('./lib/util');
 let flags = genUserServerFlag();
 const CONF = global.CONF;
@@ -56,14 +57,22 @@ function verifySid(sid){
 }
 
 const server = net.createServer(function(socket){
-  socket.setEncoding('utf-8');
+  
   socket.setNoDelay(true);
-  socket.once('data', function(sid){
+  socket.once('data', function(buffer){
+    data = buffer.toString().split(' ');
+    sid = data[0];
+    method = data[1];
     if(!verifySid(sid)){
       socket.end('not verify');
     } else {
       socket.write('ok', function(){
-        handleJsonData(socket);
+        if(!method){ // main socket
+          handleJsonData(socket);
+        } else {
+          handleNormal(method, socket);
+        }
+        // normal socket
       });
     }
   });
@@ -73,7 +82,9 @@ const server = net.createServer(function(socket){
   });
 
 });
-  
+
+
+
 server.listen(PORT);
 
 server.on('listening', function(){

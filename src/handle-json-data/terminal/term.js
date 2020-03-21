@@ -1,13 +1,11 @@
-
-// Copyright and modify form: https://github.com/xtermjs/xterm.js/blob/master/demo/server.js
-
 const pty = require('node-pty');
 const LimitFrequency = require('../../common/limit-frequency');
 const RecycleIndex = require('../../common/recycle-index');
 const terminals = require('./store');
 const recycleIndex = new RecycleIndex();
 
-const maxSize = 3000;
+const maxSize = 5000;
+
 function termCreate(data, callback){
   data = data || Object.create(null);
   term = pty.spawn(global.__USER_INFO__.shell || 'bash', [], {

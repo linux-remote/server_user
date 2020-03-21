@@ -14,6 +14,7 @@ Object.assign(methodsMap, fsMethods);
 Object.assign(methodsMap, termMethods);
 
 function handleJsonData(socket){
+  socket.setEncoding('utf-8');
   
   global.__isWsConnect = true;
   const sr = new SocketRequest(socket);
