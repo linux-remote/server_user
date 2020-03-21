@@ -14,13 +14,21 @@ Object.assign(methodsMap, fsMethods);
 Object.assign(methodsMap, termMethods);
 
 function handleJsonData(socket){
+  
+  global.__isWsConnect = true;
   const sr = new SocketRequest(socket);
   global.__SOCKET_REQUEST__ = sr;
   sr.onRequest = function(data, reply){
-    console.log('onRequest', data);
+    // console.log('onRequest', data);
+    if(Array.isArray(data)){
+      const type = data[0];
+      if(type === 2){
+        methodsMap.termWrite(data[1], data[2]);
+      }
+      return;
+    }
     const method = data.method;
     if(method === 'getDesktopBundle'){
-      
       const userInfo = os.userInfo();
       // uid, gid, username, homedir, shells
       reply({

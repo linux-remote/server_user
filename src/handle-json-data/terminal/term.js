@@ -2,8 +2,12 @@
 // Copyright and modify form: https://github.com/xtermjs/xterm.js/blob/master/demo/server.js
 
 const pty = require('node-pty');
+const LimitFrequency = require('../../common/limit-frequency');
+const RecycleIndex = require('../../common/recycle-index');
 const terminals = require('./store');
+const recycleIndex = new RecycleIndex();
 
+const maxSize = 3000;
 function termCreate(data, callback){
   data = data || Object.create(null);
   term = pty.spawn(global.__USER_INFO__.shell || 'bash', [], {
@@ -13,54 +17,65 @@ function termCreate(data, callback){
     cwd: data.cwd || process.env.HOME,
     env: process.env
   });
-  const id = term.pid.toString();
+  const id = recycleIndex.get();
+  // const id = term.pid.toString();
   terminals[id] = term;
-  
-  function buffer(timeout) {
-    let s = '';
-    let sender = null;
-    return (data) => {
-      s += data;
-      if (!sender) {
-        sender = setTimeout(() => {
-          global.__SOCKET_REQUEST__.request({
-            type: 'term',
-            id,
-            data: s
-          });
-          s = '';
-          sender = null;
-        }, timeout);
+  let tmp = '';
+  const fl = new LimitFrequency(function() {
+    global.__SOCKET_REQUEST__.request([2, id, tmp]);
+    tmp = '';
+
+  }, 40);
+
+
+  term.on('data', (data) => {
+    tmp = tmp + data;
+    if(global.__isWsConnect){
+      fl.trigger();
+    } else {
+      if(tmp.size > maxSize){
+        tmp = '';
       }
-    };
-  }
-  const send = buffer(5);
-
-  callback(null, id);
-
-  term.on('data', function(data) {
-    try {
-      send(data);
-    } catch (ex) {
-      // The WebSocket is not open, ignore
     }
   });
+  // function buffer(timeout) {
+  //   let s = '';
+  //   let sender = null;
+  //   return (data) => {
+  //     s += data;
+  //     if (!sender) {
+  //       sender = setTimeout(() => {
+  //         global.__SOCKET_REQUEST__.request({
+  //           type: 'term',
+  //           id,
+  //           data: s
+  //         });
+  //         s = '';
+  //         sender = null;
+  //       }, timeout);
+  //     }
+  //   };
+  // }
 
   term.once('exit', function(){
 
     global.__SOCKET_REQUEST__.request({
-      type: 'term',
-      id,
-      method: 'exit'
+      method: 'termExit',
+      data: id
     });
+    tmp = '';
     delete(terminals[id]);
+    recycleIndex.recycle(id);
   });
+
+  callback(null, id);
 }
 
-function termWrite(data){
-  let term = terminals[data.id];
+// arr data.
+function termWrite(id, strData){
+  let term = terminals[id];
   if(term){
-    term.write(data.data);
+    term.write(strData);
   }
 }
 
