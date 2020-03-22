@@ -12,18 +12,28 @@ Object.assign(methodsMap, quickLaunch);
 Object.assign(methodsMap, desktop);
 Object.assign(methodsMap, fsMethods);
 Object.assign(methodsMap, termMethods);
-
+const termWriteKey = 2;
 function handleJsonData(socket){
   socket.setEncoding('utf-8');
   
+
   global.__isWsConnect = true;
   const sr = new SocketRequest(socket);
   global.__SOCKET_REQUEST__ = sr;
+
+  socket.setTimeout(global._AFR_TIMEOUT__);
+  socket.on('timeout', () => {
+    sr.request({method: 'close', data: 'timeout'});
+    socket.end(function(){
+      process.exit();
+    });
+  });
+
   sr.onRequest = function(data, reply){
     // console.log('onRequest', data);
     if(Array.isArray(data)){
       const type = data[0];
-      if(type === 2){
+      if(type === termWriteKey){
         methodsMap.termWrite(data[1], data[2]);
       }
       return;
@@ -50,10 +60,11 @@ function handleJsonData(socket){
         }
       });
     } else if(method === 'logout') {
-      reply({
-        status: 200,
-        data: 'ok'
-      });
+      // reply({
+      //   status: 200,
+      //   data: 'ok'
+      // });
+      sr.request({method: 'close'});
       socket.end(function(){
         process.exit();
       });

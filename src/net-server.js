@@ -2,12 +2,13 @@ const fs = require('fs');
 const net = require('net');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
-
 const base64ToSafe = require('base64-2-safe');
 
 const handleJsonData = require('./handle-json-data/index.js');
 const handleNormal = require('./handle-normal.js');
 const { genUserServerFlag } = require('./lib/util');
+
+let serverLeaveTimer;
 let flags = genUserServerFlag();
 const CONF = global.CONF;
 const userInfo = global.__USER_INFO__;
@@ -68,6 +69,11 @@ const server = net.createServer(function(socket){
     } else {
       socket.write('ok', function(){
         if(!method){ // main socket
+          if(serverLeaveTimer){
+            console.log('clearTimeout serverLeaveTimer');
+            clearTimeout(serverLeaveTimer);
+            serverLeaveTimer = null;
+          }
           handleJsonData(socket);
         } else {
           handleNormal(method, socket);
@@ -121,6 +127,12 @@ process.on('exit', function(){
     console.error(e);
   }
 });
+
+serverLeaveTimer = setTimeout(() => {
+  serverLeaveTimer = null;
+  console.error('No main connect, server timeout.');
+  process.exit();
+}, global._AFR_TIMEOUT__);
 
 function _errOut(message){
   console.error(flags.ERR_FLAG_START + message + flags.ERR_FLAG_END);

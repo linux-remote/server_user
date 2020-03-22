@@ -19,16 +19,18 @@ function termCreate(data, callback){
   // const id = term.pid.toString();
   terminals[id] = term;
   let tmp = '';
-  const fl = new LimitFrequency(function() {
-    global.__SOCKET_REQUEST__.request([2, id, tmp]);
-    tmp = '';
+  const lf = new LimitFrequency(function() {
+    if(tmp){
+      global.__SOCKET_REQUEST__.request([2, id, tmp]);
+      tmp = '';
+    }
   }, 30);
 
-
+  
   term.on('data', (data) => {
     tmp = tmp + data;
     if(global.__isWsConnect){
-      fl.trigger();
+      lf.trigger();
     } else {
       if(tmp.size > maxSize){
         tmp = '';
@@ -55,12 +57,14 @@ function termCreate(data, callback){
   // }
 
   term.once('exit', function(){
+    lf.end();
 
     global.__SOCKET_REQUEST__.request({
       method: 'termExit',
       data: id
     });
-    tmp = '';
+    
+    tmp = null;
     delete(terminals[id]);
     recycleIndex.recycle(id);
   });
