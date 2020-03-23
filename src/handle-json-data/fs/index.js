@@ -17,8 +17,7 @@ module.exports = {
   },
   getRecycleBin(data, callback){
     ls({
-      cwd: global.RECYCLE_BIN_PATH,
-      noDir: true
+      cwd: global.RECYCLE_BIN_PATH
     }, callback);
   }
 }

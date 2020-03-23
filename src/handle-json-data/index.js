@@ -13,6 +13,7 @@ Object.assign(methodsMap, desktop);
 Object.assign(methodsMap, fsMethods);
 Object.assign(methodsMap, termMethods);
 const termWriteKey = 2;
+const exitKey = 0;
 function handleJsonData(socket){
   socket.setEncoding('utf-8');
   
@@ -23,7 +24,8 @@ function handleJsonData(socket){
 
   socket.setTimeout(global._AFR_TIMEOUT__);
   socket.on('timeout', () => {
-    sr.request({method: 'close', data: 'timeout'});
+    sr.request([exitKey, 'timeout']);
+    console.log('socket timeout');
     socket.end(function(){
       process.exit();
     });
@@ -64,7 +66,7 @@ function handleJsonData(socket){
       //   status: 200,
       //   data: 'ok'
       // });
-      sr.request({method: 'close'});
+      sr.request([exitKey]);
       socket.end(function(){
         process.exit();
       });

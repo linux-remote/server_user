@@ -8,6 +8,9 @@ function escapePath(str){
 // exports.escapePath = escapePath;
 
 exports.wrapPath = function(str){
+  if(str.length === 0){
+    return str;
+  }
   str = escapePath(str);
   return `'${str}'`;
 }

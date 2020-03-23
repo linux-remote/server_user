@@ -1,7 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-function readdir(dir, callback){
+function readdir(data, callback){
+  let dir, all = true;
+  if(typeof data === 'string'){
+    dir = data;
+  } else {
+    dir = data.address;
+    all = data.all;
+  }
   fs.readdir(dir, {withFileTypes: true}, function(err, files){
     if(err){
       return callback(err);
@@ -10,10 +17,12 @@ function readdir(dir, callback){
     const result = [];
     for(; i < len; i++){
       dirent = files[i];
-      result.push({
-        name: dirent.name,
-        type: _getType(dirent)
-      });
+      if(all || dirent.name[0] !== '.'){
+        result.push({
+          name: dirent.name,
+          type: _getType(dirent)
+        });
+      }
     }
     callback(null, result);
   });

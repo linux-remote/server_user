@@ -18,18 +18,27 @@ function ls(opts, callback){
 
 function genCmd(opts) {
 
-  let d = '', a = ` -a --ignore='..'`;
+  let d = '', a = '';
   let filename = '';
   
 
   if(opts.filename) {
     d = ' -d';
-    filename = wrapPath(opts.filename);
+    if(Array.isArray(opts.filename)){
+      filename = opts.filename.map(name => {
+        return wrapPath(name);
+      });
+      filename = filename.join(' ');
+    } else {
+      filename = wrapPath(opts.filename);
+    }
   }
-
-  if(opts.noDir){ //去掉 . 和 ..
-    a = ' -A';
+  if(opts.all){ //去掉 . 和 ..
+    a = ` -A`;
   }
+  // if(opts.dir){ // 包含 . 
+  //   a = ` -a --ignore='..'`;
+  // }
   const cmd = `ls -U -l --color=none -Q --time-style='+%Y-%m-%d %H:%M:%S'${a}${d} -- ${filename}`;
   return cmd;
 }
