@@ -1,6 +1,6 @@
 
-const {execComplete} = require('../../api/child-exec');
-const {wrapPath} = require('../../api/util');
+const {execComplete} = require('../../lib/child-exec');
+const {wrapPath} = require('../../lib/util');
 // const {execStream} = require('../child-exec');
 // function lsStream(req, res){
 //   const opts = req._cmd_ls_opts || Object.create(null);

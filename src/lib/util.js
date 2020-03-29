@@ -1,73 +1,46 @@
 const fs = require('fs');
 const path = require('path');
-// const crypto = require('crypto');
+
+// echo "`whomai` $HOME" -> dw /home/dw
+// echo '`whomai` $HOME' -> `whomai` $HOME
+// echo '`whomai` \\n'
+function escapePath(str){
+  str = str.replace(/\\/g, '\\\\');
+  return str.replace(/'/g, function(mstr){
+    return '\\' + mstr;
+  });
+}
+// exports.escapePath = escapePath;
+
+exports.wrapPath = function(str){
+  if(str.length === 0){
+    return str;
+  }
+  str = escapePath(str);
+  return `'${str}'`;
+}
+
+exports.fsGetOrInit = function (filePath, data, callback){
+  fs.readFile(filePath, 'utf-8', function(err, result){
+    if(err){
+      if(err.code === "ENOENT"){
+        fs.writeFile(filePath, data, function(err){
+          if(err){
+            return callback(err);
+          }
+          callback(null, data);
+        });
+      }else{
+        callback(err);
+      }
+    }else{
+      callback(null, result);
+    }
+  })
+}
+
 const sortTimeStartPoint = 1585391460206; // 2020/03/28
 let autoIId = 0;
-// exports.timeFormat = function(date, fmt){
-//   date = date ? new Date(date) : new Date();
-//   fmt = fmt || 'yyyy-MM-dd HH:mm:ss';
-//   var o = {
-//     'M+': date.getMonth() + 1,
-//     'd+': date.getDate(),
-//     'H+': date.getHours(),
-//     'm+': date.getMinutes(),
-//     's+': date.getSeconds(),
-//     'q+': Math.floor((date.getMonth() + 3) / 3),
-//     'S': date.getMilliseconds()
-//   };
-//   if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
-//   for (var k in o)
-//     if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
-//   return fmt;
-// }
-
-
-/**
- * Event listener for HTTP server "error" event.
- */
-// $$common$$
-exports.onError = function(port){
-  return function(error) {
-    if (error.syscall !== 'listen') {
-      throw error;
-    }
-
-    var bind = typeof port === 'string'
-      ? 'Pipe ' + port
-      : 'Port ' + port;
-
-    // handle specific listen errors with friendly messages
-    switch (error.code) {
-      case 'EACCES':
-        console.error(bind + ' requires elevated privileges');
-        process.exit(1);
-        break;
-      case 'EADDRINUSE':
-        console.error(bind + ' is already in use');
-        process.exit(1);
-        break;
-      default:
-        throw error;
-    }
-  }
-}
-
-/**
- * Event listener for HTTP server "listening" event.
- */
-// $$common$$
-exports.onListening = function(server, callback) {
-  return function(){
-    var addr = server.address();
-    var bind = typeof addr === 'string'
-      ? 'pipe ' + addr
-      : 'port ' + addr.port;
-    console.info('Listening on ' + bind);
-    console.info('NODE_ENV ' + process.env.NODE_ENV);
-    callback && callback();
-  }
-}
-
 exports.ensureUniqueId = function(filePath){
   return function generateId(callback) {
     var id = Date.now() - sortTimeStartPoint;

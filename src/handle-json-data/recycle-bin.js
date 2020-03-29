@@ -1,10 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const sas = require('sas');
-const { execComplete } = require('../api/child-exec.js');
-const { ensureUniqueId } = require('../lib/util.js');
+const { execComplete } = require('../lib/child-exec.js');
+const { wrapPath, ensureUniqueId } = require('../lib/util.js');
 const { checkCoverByLstat } = require('../lib/fs-check-cover.js');
-const {wrapPath} = require('../api/util');
 
 const PATH = global.RECYCLE_BIN_PATH;
 const generateRecycleId = ensureUniqueId(PATH);

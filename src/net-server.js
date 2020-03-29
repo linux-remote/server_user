@@ -8,7 +8,7 @@ const handleJsonData = require('./handle-json-data/index.js');
 const handleNormal = require('./handle-normal.js');
 const { genUserServerFlag } = require('./lib/util');
 
-let serverLeaveTimer;
+let serverTimeoutTimer;
 let flags = genUserServerFlag();
 const CONF = global.CONF;
 const userInfo = global.__USER_INFO__;
@@ -69,10 +69,10 @@ const server = net.createServer(function(socket){
     } else {
       socket.write('ok', function(){
         if(!method){ // main socket
-          if(serverLeaveTimer){
-            console.log('clearTimeout serverLeaveTimer');
-            clearTimeout(serverLeaveTimer);
-            serverLeaveTimer = null;
+          if(serverTimeoutTimer){
+            console.log('Clear server timeout timer.');
+            clearTimeout(serverTimeoutTimer);
+            serverTimeoutTimer = null;
           }
           handleJsonData(socket);
         } else {
@@ -128,8 +128,8 @@ process.on('exit', function(){
   }
 });
 
-serverLeaveTimer = setTimeout(() => {
-  serverLeaveTimer = null;
+serverTimeoutTimer = setTimeout(() => {
+  serverTimeoutTimer = null;
   console.error('No main connect, server timeout.');
   process.exit();
 }, global._AFR_TIMEOUT__);
