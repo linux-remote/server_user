@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 // const crypto = require('crypto');
-const sortTimeStartPoint = 1579660004551; // 2020/01/22
-
+const sortTimeStartPoint = 1585391460206; // 2020/03/28
+let autoIId = 0;
 // exports.timeFormat = function(date, fmt){
 //   date = date ? new Date(date) : new Date();
 //   fmt = fmt || 'yyyy-MM-dd HH:mm:ss';
@@ -71,6 +71,9 @@ exports.onListening = function(server, callback) {
 exports.ensureUniqueId = function(filePath){
   return function generateId(callback) {
     var id = Date.now() - sortTimeStartPoint;
+    id = id.toString();
+    id = id + '-' + autoIId;
+    autoIId = autoIId + 1;
     fs.lstat(path.join(filePath, id), function(err){
       if(err){
         if(err.code === 'ENOENT'){

@@ -1,4 +1,8 @@
 const fs = require('fs');
+
+// echo "`whomai` $HOME" -> dw /home/dw
+// echo '`whomai` $HOME' -> `whomai` $HOME
+// echo '`whomai` \\n'
 function escapePath(str){
   str = str.replace(/\\/g, '\\\\');
   return str.replace(/'/g, function(mstr){

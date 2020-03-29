@@ -10,7 +10,7 @@ const {wrapPath} = require('../../api/util');
 // }
 
 function ls(opts, callback){
-  // filename, cwd, noDir
+  // filenames, cwd, noDir
   const cmd = genCmd(opts);
   const cwd = opts.cwd;
   execComplete(cmd, callback, cwd);
@@ -19,19 +19,15 @@ function ls(opts, callback){
 function genCmd(opts) {
 
   let d = '', a = '';
-  let filename = '';
+  let filenames = '';
   
 
-  if(opts.filename) {
+  if(opts.filenames) {
     d = ' -d';
-    if(Array.isArray(opts.filename)){
-      filename = opts.filename.map(name => {
-        return wrapPath(name);
-      });
-      filename = filename.join(' ');
-    } else {
-      filename = wrapPath(opts.filename);
-    }
+    filenames = opts.filenames.map(name => {
+      return wrapPath(name);
+    });
+    filenames = filenames.join(' ');
   }
   if(opts.all){ //去掉 . 和 ..
     a = ` -A`;
@@ -39,7 +35,7 @@ function genCmd(opts) {
   // if(opts.dir){ // 包含 . 
   //   a = ` -a --ignore='..'`;
   // }
-  const cmd = `ls -U -l --color=none -Q --time-style='+%Y-%m-%d %H:%M:%S'${a}${d} -- ${filename}`;
+  const cmd = `ls -U -l --color=none -Q --time-style='+%Y-%m-%d %H:%M:%S'${a}${d} -- ${filenames}`;
   return cmd;
 }
 

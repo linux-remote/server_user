@@ -1,17 +1,19 @@
 
 const os = require('os');
 const termMap = require('./terminal/store.js');
-const SocketRequest = require('../../../socket-request/index.js');
+const SocketRequest = require('../../../../socket-request/index.js');
 
 const quickLaunch = require('./quick-launch.js');
 const desktop = require('./desktop.js');
 const fsMethods = require('./fs/index.js');
 const termMethods = require('./terminal/term.js');
+const recycleBin = require('./recycle-bin.js');
 const methodsMap = Object.create(null);
 Object.assign(methodsMap, quickLaunch);
 Object.assign(methodsMap, desktop);
 Object.assign(methodsMap, fsMethods);
 Object.assign(methodsMap, termMethods);
+Object.assign(methodsMap, recycleBin);
 const termWriteKey = 2;
 const exitKey = 0;
 function handleJsonData(socket){

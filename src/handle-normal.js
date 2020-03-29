@@ -1,12 +1,14 @@
 const fs = require('fs');
-
+const {checkCoverByLstat} = require('./lib/fs-check-cover');
 function handleNormal(method, socket){
   socket.once('data', function(buffer){
 
     const filePath = buffer.toString();
 
     if(method === 'download'){
-      fs.access(filePath, fs.constants.R_OK, (err) => {
+
+
+      fs.lstat(filePath, function(err, stat){
         if(err){
           socket.end(JSON.stringify({
             status: 'error',
@@ -15,35 +17,39 @@ function handleNormal(method, socket){
           return;
         }
 
-        fs.lstat(filePath, function(err, stat){
+        let resData = {
+          status: 'success',
+          data: {
+            size: stat.size,
+            mtime: stat.mtime.getTime()
+          }
+        }
+        socket.write(JSON.stringify(resData));
+        socket.once('data', () => {
+          const stream = fs.createReadStream(filePath);
           
-          if(err){
-            socket.end(JSON.stringify({
-              status: 'error',
-              message: err.message
-            }));
-            return;
-          }
-
-          let resData = {
-            status: 'success',
-            data: {
-              size: stat.size,
-              mtime: stat.mtime.getTime()
+          stream.on('error', function(err){
+            if(!socket.destroyed){
+              stream.unpipe(socket);
+              try {
+                socket.end(JSON.stringify({
+                  status: 'error',
+                  message: err.message
+                }));
+              } catch(e){
+                console.error('download fail after steam error:', e);
+              }
             }
-          }
-          socket.write(JSON.stringify(resData));
-          socket.once('data', () => {
-            const stream = fs.createReadStream(filePath);
-            stream.pipe(socket);
+            // stream.destroy();
           });
+          stream.pipe(socket);
         });
-
       });
+
       
 
     } else if(method === 'upload'){
-      fs.access(filePath, fs.constants.W_OK, (err) => {
+      checkCoverByLstat(filePath, (err) => {
         if(err){
           socket.end(JSON.stringify({
             status: 'error',
@@ -55,6 +61,20 @@ function handleNormal(method, socket){
           status: 'success'
         }));
         const stream = fs.createWriteStream(filePath);
+        stream.on('error', function(err){
+          if(!socket.destroyed){
+            socket.unpipe(stream);
+            try {
+              socket.end(JSON.stringify({
+                status: 'error',
+                message: err.message
+              }));
+            } catch(e){
+              console.error('upload fail after steam error:', e);
+            }
+          }
+          // stream.destroy();
+        });
         socket.pipe(stream);
       });
 

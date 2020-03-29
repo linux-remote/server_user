@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 
 function readdir(data, callback){
   let dir, all = true;
