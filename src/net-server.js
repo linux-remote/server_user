@@ -74,18 +74,30 @@ const server = net.createServer(function(socket){
             clearTimeout(serverTimeoutTimer);
             serverTimeoutTimer = null;
           }
+          socket.setTimeout(global._AFR_TIMEOUT__);
+          socket.on('timeout', () => {
+            sr.request([exitKey, 'timeout']);
+            console.log('socket timeout');
+            socket.off('close', startServerTimeout);
+            socket.end(() => {
+              process.exit();
+            });
+          });
+        
+          socket.on('close', startServerTimeout);
+
           handleJsonData(socket);
         } else {
           handleNormal(method, socket);
         }
-        // normal socket
+        socket.on('error', function(err){
+          console.error(err);
+        });
       });
     }
   });
 
-  socket.on('error', function(err){
-    console.log(err);
-  });
+
 
 });
 
@@ -128,11 +140,15 @@ process.on('exit', function(){
   }
 });
 
-serverTimeoutTimer = setTimeout(() => {
-  serverTimeoutTimer = null;
-  console.error('No main connect, server timeout.');
-  process.exit();
-}, global._AFR_TIMEOUT__);
+function startServerTimeout(){
+  serverTimeoutTimer = setTimeout(() => {
+    serverTimeoutTimer = null;
+    console.error('No main connect, server timeout.');
+    process.exit();
+  }, global._AFR_TIMEOUT__);
+}
+
+startServerTimeout();
 
 function _errOut(message){
   console.error(flags.ERR_FLAG_START + message + flags.ERR_FLAG_END);

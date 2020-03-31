@@ -16,22 +16,18 @@ Object.assign(methodsMap, termMethods);
 Object.assign(methodsMap, recycleBin);
 const termWriteKey = 2;
 const exitKey = 0;
+const wsOpenKey = 3;
+const wsOnCloseKey = 4;
+
 function handleJsonData(socket){
   socket.setEncoding('utf-8');
   
 
-  global.__isWsConnect = true;
+  // global.__isWsConnect = true;
   const sr = new SocketRequest(socket);
   global.__SOCKET_REQUEST__ = sr;
 
-  socket.setTimeout(global._AFR_TIMEOUT__);
-  socket.on('timeout', () => {
-    sr.request([exitKey, 'timeout']);
-    console.log('socket timeout');
-    socket.end(function(){
-      process.exit();
-    });
-  });
+
 
   sr.onRequest = function(data, reply){
     // console.log('onRequest', data);
@@ -39,6 +35,14 @@ function handleJsonData(socket){
       const type = data[0];
       if(type === termWriteKey){
         methodsMap.termWrite(data[1], data[2]);
+      } else if(type === wsOpenKey){
+        global.__isWsConnect = true;
+      } else if(type === wsOnCloseKey){
+        global.__isWsConnect = false;
+        const isNormalClose = data[1];
+        if(isNormalClose){
+          process.exit();
+        }
       }
       return;
     }
