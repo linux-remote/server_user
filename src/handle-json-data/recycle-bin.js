@@ -7,8 +7,30 @@ const { checkCoverByLstat } = require('../lib/fs-check-cover.js');
 
 const PATH = global.RECYCLE_BIN_PATH;
 const generateRecycleId = ensureUniqueId(PATH);
+let MAX_LEN = 400;
+let lenCache = 0;
+function getRecycleBinLen(data, callback){
+  if(lenCache){
+    callback(null, lenCache);
+    return;
+  }
+  getDirLen(PATH, function(err, len){
+    if(err){
+      return callback(err);
+    }
+    lenCache = len;
+    callback(null, lenCache);
+  })
+}
 
 function mvToRecycleBin(data, callback){
+  if(lenCache > MAX_LEN){
+    callback({
+      name: 'Error',
+      message: 'The Recycle Bin is Full.'
+    })
+    return;
+  }
   const cwd = data.cwd;
   if(cwd === PATH){
     callback(new Error('Wrong place'));
@@ -44,12 +66,22 @@ function mvToRecycleBin(data, callback){
     if(err){
       return callback(err);
     }
-    callback(null, ids);
+    lenCache = lenCache + (ids.length * 2);
+    callback(null, {
+      ids,
+      len: lenCache
+    });
   });
 }
 
 function emptyRecycleBin(data, callback){
-  execComplete(`rm -rf -- ./*`, callback, PATH);
+  execComplete(`rm -rf -- ./*`, function(err){
+    if(err){
+      return callback(err);
+    }
+    lenCache = 0;
+    callback(null, lenCache);
+  }, PATH);
 }
 
 function recycleBinDel(data, callback){ // 永久删除
@@ -57,11 +89,23 @@ function recycleBinDel(data, callback){ // 永久删除
   const filenames = data.filenames.map(filename => {
     return wrapPath(filename);
   });
-  execComplete(`rm -rf -- ${filenames.join(' ')}`, callback, PATH);
+  execComplete(`rm -rf -- ${filenames.join(' ')}`, function(err){
+    if(err){
+      return callback(err);
+    }
+    lenCache = lenCache - filenames.length;
+    callback(null, lenCache);
+  }, PATH);
 }
 
 function recycleBinResotre(data, callback){
-  
+  if(lenCache > MAX_LEN){
+    callback({
+      name: 'Error',
+      message: 'The Recycle Bin is Full.'
+    })
+    return;
+  }
   const sourcePath = path.resolve(PATH, data.sourcePath);
   checkCoverByLstat(sourcePath, function(err){
     if(err){
@@ -76,14 +120,51 @@ function recycleBinResotre(data, callback){
       if(err){
         return callback(err);
       }
-      callback(null);
+      lenCache = lenCache - 2;
+      callback(null, lenCache);
     });
 
   })
 }
 module.exports = {
+  getRecycleBinLen,
   mvToRecycleBin,
   emptyRecycleBin,
   recycleBinDel,
   recycleBinResotre
+}
+
+function getDirLen(dir, callback){
+  let len = 0;
+  fs.opendir(dir, function(err, dir){
+    if(err){
+      callback(err);
+      return;
+    }
+    function close(){
+      dir.close(function(err) {
+        if(err){
+          callback(err);
+          return;
+        }
+        callback(null, len);
+      });
+    }
+    function loop(){
+  
+      dir.read(function(err, dirent){
+        if(err){
+          callback(err);
+          return;
+        }
+        if(!dirent){
+          close();
+          return;
+        }
+        len = len + 1;
+        loop();
+      });
+    }
+    loop();
+  });
 }
