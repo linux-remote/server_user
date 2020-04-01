@@ -1,7 +1,7 @@
 
 const os = require('os');
 const termMap = require('./terminal/store.js');
-const SocketRequest = require('../../../../socket-request/index.js');
+const SocketRequest = require('@hezedu/socket-request');
 
 const quickLaunch = require('./quick-launch.js');
 const desktop = require('./desktop.js');
