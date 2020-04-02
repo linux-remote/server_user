@@ -1,10 +1,10 @@
 const fs = require('fs');
 
 exports.checkCoverByLstat = function(filePath, callback){
-  fs.lstat(filePath, function(err){
+  fs.lstat(filePath, function(err, stat){
     if(err) {
       if(err.code === 'ENOENT'){
-        return callback(null);
+        return callback(null, stat);
       }
       return callback(err);
     }

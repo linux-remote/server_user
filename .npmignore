@@ -1,3 +1,4 @@
-/test.js
-/.eslintignore
-/.eslintrc.json
+test.js
+.eslintignore
+.eslintrc.json
+watcher.js
