@@ -15,7 +15,7 @@ Object.assign(methodsMap, fsMethods);
 Object.assign(methodsMap, termMethods);
 Object.assign(methodsMap, recycleBin);
 const termWriteKey = 2;
-const exitKey = 0;
+const exitKey = global.CONF.arrSrExitKey;
 const wsOpenKey = 3;
 const wsOnCloseKey = 4;
 

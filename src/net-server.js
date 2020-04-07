@@ -76,10 +76,11 @@ const server = net.createServer(function(socket){
           }
           socket.setTimeout(global._AFR_TIMEOUT__);
           socket.on('timeout', () => {
-            sr.request([exitKey, 'timeout']);
+            global.__SOCKET_REQUEST__.request([CONF.arrSrExitKey, 'timeout']);
             console.log('socket timeout');
             socket.off('close', startServerTimeout);
             socket.end(() => {
+              console.log('\n----------------- process.exit -----------------\n');
               process.exit();
             });
           });
