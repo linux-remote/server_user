@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const sas = require('sas');
+
 const readdir = require('./readdir.js');
 const {checkCoverByLstat} = require('../../lib/fs-check-cover');
 const ls = require('./ls.js');
@@ -29,6 +31,25 @@ module.exports = {
       const srcPath = path.join(cwd, filename);
       fs.rename(srcPath, destPath, callback);
     });
+  },
+
+  fsCheckCover({cwd, filenames}, callback){
+    fs.readdir(cwd, function(err, files){
+      if(err){
+        return callback(err);
+      }
+      const map = Object.create(null);
+      filenames.forEach(name => {
+        map[name] = true;
+      })
+      const covered = [];
+      files.forEach(filename => {
+        if(map[filename]){
+          covered.push(filename)
+        }
+      });
+      callback(null, covered);
+    })
   }
   // getRecycleBin(data, callback){
   //   ls({

@@ -10,8 +10,8 @@ global.__USER_INFO__ = userInfo;
 
 CONF.arrSrExitKey = 0;
 
-global._AFR_TIMEOUT__ =  global.IS_PRO ? 1000 * 60 * 15 : 1000 * 20;
-console.log('global._AFR_TIMEOUT__', global._AFR_TIMEOUT__)
+global._AFR_TIMEOUT__ =  global.IS_PRO ? 1000 * 60 * 15 : 1000 * 60 * 15 * 100;
+// console.log('global._AFR_TIMEOUT__', global._AFR_TIMEOUT__)
 global.RECYCLE_BIN_PATH = path.join(CONF.hiddenRootDir, 'recycle-bin');
 // Protect my disk
 global.__TMP_DIR__ = global.IS_PRO ? os.tmpdir() : '/dev/shm';
