@@ -2,12 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const sas = require('sas');
 
-const readdir = require('./readdir.js');
+const openLoopDir = require('./open-loop-dir.js');
 const {checkCoverByLstat} = require('../../lib/fs-check-cover');
 const ls = require('./ls.js');
 module.exports = {
   ls,
-  readdir,
+  openLoopDir,
   readFile(filePath, callback){
     fs.readFile(filePath, 'utf-8', callback);
   },
