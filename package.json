@@ -1,6 +1,7 @@
 {
-  "name": "@linux-remote/user-server",
-  "version": "4.0.3",
+  "name": "@linux-remote/server_user",
+  "description": "linux-remote  server side user process.",
+  "version": "4.3.0",
   "author": {
     "name": "Du Wei",
     "email": "hezedu@hotmail.com"
@@ -8,7 +9,7 @@
   "main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:linux-remote/linux-remote-user-server.git"
+    "url": "git@github.com:linux-remote/server_user.git"
   },
   "files": [
     "src",
@@ -16,7 +17,8 @@
   ],
   "scripts": {
     "linuxIpty": "npm install node-pty --save --no-bin-links",
-    "publish": "node ../linux-remote/up-version-map.js"
+    "publish": "node ../linux-remote/up-version-map.js",
+    "p": "npm publish --access public"
   },
   "license": "MPL-2.0",
   "engines": {
