@@ -107,7 +107,7 @@ const server = net.createServer(function(socket){
 server.listen(PORT);
 
 server.on('listening', function(){
-  execSync('(chmod 600 -- ' + PORT + ') && (setfacl -m u:linux-remote:rw -- ' + PORT + ')');
+  execSync('(chmod 660 -- ' + PORT + ') && (chgrp linux-remote ' + PORT + ')');
   console.info(flags.START_FLAG);
   flags = null;
 });
