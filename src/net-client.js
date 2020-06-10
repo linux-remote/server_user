@@ -66,7 +66,7 @@ function init(){
 
 
   let isEnd = false;
-  
+  let isError = false;
   
   function _end(err){
     if(isEnd){
@@ -77,6 +77,7 @@ function init(){
     client.off('error', _beforeErrListener);
 
     if(err){
+      isError = true;
       console.error('user process create fail', err)
       return;
     }
@@ -98,7 +99,7 @@ function init(){
 
 
   client.on('close', function(){
-    if(process.ppid === ppid){
+    if(process.ppid === ppid && !isError){
       // init();
       isConnect = false;
       reConnect();
