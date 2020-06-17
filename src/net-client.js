@@ -1,111 +1,122 @@
 
 const net = require('net');
+const os = require('os');
+const userInfo = os.userInfo();
 const handleJsonData = require('./handle-json-data/index.js');
-// const handleNormal = require('./handle-normal.js');
 
-const ppid = process.ppid;
-let sid;
+const socketPath = (global.IS_PRO ? os.tmpdir() : '/dev/shm') + '/linux-remote-server_main.sock';
+const reConnectMax = 5;
+const reConnectInterval = 1000;
+
+let sidCache;
 let isConnect = false;
 let reConnectCount = 0;
-const reConnectMax = 5;
-const reConnectInterval = 1500;
 let reConnectTimer = null;
-function init(){
 
-  const client = net.createConnection(global._MAIN_PORT__, () => {
+function init(){
+  const client = net.createConnection(socketPath, () => {
     isConnect = true;
     reConnectCount = 0;
+
     if(reConnectTimer){
       clearTimeout(reConnectTimer);
     }
 
     client.setEncoding('utf-8');
-    if(sid){
-      client.write(sid + ' ' + global.__USER_INFO__.username);
-    } else {
-      client.write(process.env.LR_ONCE_TOKEN);
-    }
-    client.once('data', _firstDataListener);
+    client.write(sidCache + ' ' + userInfo.username);
+    client.once('data', function _firstDataListener(msg){
+      if(msg === 'ok'){
+        // Avoid sticking
+        client.write('ready', function(){
+          _end(null, client);
+        });
+        
+      } else {
+        _end(new Error(msg));
+      }
+    });
   });
 
-  client.once('error', _beforeErrListener);
-  function _beforeErrListener(){
-    if(!isConnect){
-      reConnect();
-    }
-  }
-
-  function reConnect(){
-    if(isConnect || reConnectCount >= reConnectMax){
-      reConnectTimer = null;
-      return;
-    }
-    console.log('reConnectCount', reConnectCount)
-    reConnectTimer = setTimeout(function(){
-      init();
-      reConnectCount = reConnectCount + 1;
-      reConnect();
-    }, reConnectInterval);
-  }
-
-  function _firstDataListener(data){
-    let msgs = data.split(' ');
-    if(msgs[0] === 'ok'){
-      if(!sid){
-        if(!msgs[1]){
-          throw new Error('un have sid.');
-        }
-        sid = msgs[1];
-      }
-      _end(null, client);
-    } else {
-      _end(new Error('403'));
-    }
-  }
+  
 
 
-
-  let isEnd = false;
-  let isError = false;
+  let isInnerError = false;
   
   function _end(err){
-    if(isEnd){
-      return;
-    }
-    isEnd = true;
-
-    client.off('error', _beforeErrListener);
-
     if(err){
-      isError = true;
-      console.error('user process create fail', err)
+      isInnerError = true;
+      console.error('\n[server_user]: user process create fail', err.message);
+      if(!client.destroyed){
+        client.destroy();
+      }
       return;
     }
-    console.log('user process create success');
+    console.log('\n[server_user]: user process create success');
+    // -------------------- success --------------------
+
+
+    handleJsonData(client);
+
     client.setTimeout(global._AFR_TIMEOUT__);
     client.on('timeout', () => {
       global.__SOCKET_REQUEST__.request([global.CONF.arrSrExitKey, 'timeout']);
-      console.log('socket timeout');
+      console.log('[server_user]: socket timeout');
       client.end(() => {
-        console.log('\n----------------- process.exit -----------------\n');
+        console.log('[server_user]: \n----------------- process.exit -----------------\n');
         process.exit();
       });
     });
-    client.on('error', function(err){
-      console.error('handle client error', err);
-    })
-    handleJsonData(client);
+    // client.on('error', function(err){
+    //   console.error('[server_user]: handle client error', err);
+    // });
   }
 
 
-  client.on('close', function(){
-    if(process.ppid === ppid && !isError){
-      // init();
+  client.on('close', function(hadError){
+    if(!isConnect){
+      return;
+    }
+    if(!isInnerError){
+      // when server_main reload.
+      console.log('[server_user]: disconnected. reConnecting...');
       isConnect = false;
       reConnect();
+    } else {
+      console.log('[server_user]: disconnected. isInnerError', isInnerError, 'hadError', hadError);
     }
-  })
+  });
+  
+  client.on('error', function(err){
+    if(reConnectTimer){
+      console.error('[server_user]: reConnect ' + err.name + ': ' + err.message);
+    } else {
+      console.error('[server_user]: error', err);
+    }
+  });
 }
 
-init();
+function reConnect(){
+  let isOutMax = reConnectCount >= reConnectMax;
+  if(isConnect || isOutMax){
+    reConnectTimer = null;
+    if(isOutMax){
+      console.error('[server_user]: reConnect count out.');
+    }
+    return;
+  }
+  reConnectTimer = setTimeout(function(){
+    init();
+    console.log('[server_user]: reConnect count', reConnectCount);
+    reConnectCount = reConnectCount + 1;
+    reConnect();
+  }, reConnectInterval);
+}
 
+
+
+function connectServerMain(sid){
+  sidCache = sid;
+  init();
+}
+
+module.exports = connectServerMain;
