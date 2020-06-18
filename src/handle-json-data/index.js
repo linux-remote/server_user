@@ -15,7 +15,7 @@ Object.assign(methodsMap, fsMethods);
 Object.assign(methodsMap, termMethods);
 Object.assign(methodsMap, recycleBin);
 const termWriteKey = 2;
-const exitKey = global.CONF.arrSrExitKey;
+// const exitKey = global.CONF.arrSrExitKey;
 const wsOpenKey = 3;
 const wsOnCloseKey = 4;
 
@@ -39,10 +39,10 @@ function handleJsonData(socket){
         global.__isWsConnect = true;
       } else if(type === wsOnCloseKey){
         global.__isWsConnect = false;
-        const isNormalClose = data[1];
-        if(isNormalClose){
-          process.exit();
-        }
+        // const isNormalClose = data[1];
+        // if(isNormalClose){
+        //   process.exit();
+        // }
       }
       return;
     }
@@ -67,15 +67,15 @@ function handleJsonData(socket){
           time: d.getTime()
         }
       });
-    } else if(method === 'logout') {
-      // reply({
-      //   status: 200,
-      //   data: 'ok'
-      // });
-      sr.request([exitKey]);
-      socket.end(function(){
-        process.exit();
-      });
+    // } else if(method === 'lo!gout') {
+    //   // reply({
+    //   //   status: 200,
+    //   //   data: 'ok'
+    //   // });
+    //   sr.request([exitKey]);
+    //   socket.end(function(){
+    //     process.exit();
+    //   });
     } else if(methodsMap[method]) {
 
       methodsMap[method](data.data, function(err, data){
