@@ -8,7 +8,7 @@ const maxSize = 5000;
 
 function termCreate(data, callback){
   data = data || Object.create(null);
-  term = pty.spawn(global.__USER_INFO__.shell || 'bash', [], {
+  const term = pty.spawn(global.__USER_INFO__.shell || 'bash', [], {
     name: 'xterm-256color',
     cols: data.cols || 80,
     rows: data.rows || 24,
@@ -59,10 +59,7 @@ function termCreate(data, callback){
   term.once('exit', function(){
     lf.end();
 
-    global.__SOCKET_REQUEST__.request({
-      method: 'termExit',
-      data: id
-    });
+    global.__SOCKET_REQUEST__.request(['termExit', id]);
     
     tmp = null;
     delete(terminals[id]);
@@ -82,9 +79,9 @@ function termWrite(id, strData){
 
 function termResize(data, callback){
   var id = parseInt(data.id),
-  cols = parseInt(data.cols),
-  rows = parseInt(data.rows),
-  term = terminals[id];
+    cols = parseInt(data.cols),
+    rows = parseInt(data.rows),
+    term = terminals[id];
   term.resize(cols, rows);
   callback(null, 'ok');
 }
