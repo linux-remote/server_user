@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const sas = require('sas');
+
 
 const openLoopDir = require('./open-loop-dir.js');
 const {checkCoverByLstat} = require('../../lib/fs-check-cover');
