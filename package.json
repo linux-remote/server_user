@@ -1,7 +1,7 @@
 {
   "name": "@linux-remote/server_user",
   "description": "linux-remote  server side user process.",
-  "version": "4.7.0",
+  "version": "4.8.0",
   "author": {
     "name": "Du Wei",
     "email": "hezedu@hotmail.com"
