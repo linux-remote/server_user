@@ -19,7 +19,7 @@ function terminalPassThrough(_opt, callback){
     callback(null, password);
   }
   let timer;
-  if(typeof _opt.timeout === 'number'){
+  if(typeof opt.timeout === 'number'){
     timer = setTimeout(function(){
       done(new Error('passWordThrough timeout'));
     }, _opt.timeout);
