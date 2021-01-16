@@ -1,13 +1,18 @@
 const Stream = require('stream');
 const readline = require('readline');
-const READY_MARK = 'TERMINAL_PASS_THROUGH_READY:';
+
 function terminalPassThrough(_opt, callback){
   const opt = _opt || Object.create(null);
-  const pass = new Stream.PassThrough();
-  pass.pipe(process.stdout);
-  var rlOpts = { input: process.stdin, output: pass, terminal: true, prompt: READY_MARK }
+  if(!opt.prompt){
+    throw new Error('terminalPassThrough required a prompt.');
+  }
+
+  var rlOpts = { input: process.stdin, output: process.stdout, terminal: true, prompt: opt.prompt }
   var rl = readline.createInterface(rlOpts);
   rl.prompt();
+  const pass = new Stream.PassThrough();
+  pass.pipe(process.stdout);
+  rl.output = pass;
   let password = '';
 
   function done(err){
@@ -35,8 +40,6 @@ function terminalPassThrough(_opt, callback){
     }
   };
 }
-
-terminalPassThrough.READY_MARK = READY_MARK;
 
 module.exports = terminalPassThrough;
 
